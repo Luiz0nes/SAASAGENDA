@@ -63,6 +63,22 @@ export function whatsappLink(phone: string, text?: string): string {
   return `https://wa.me/${digits}${query}`;
 }
 
+/** "@gh.barber", "instagram.com/gh.barber/" ou link completo -> "gh.barber" */
+export function instagramHandle(text: string | null | undefined): string {
+  let value = (text ?? '').trim();
+  const fromUrl = /instagram\.com\/([^/?#\s]+)/i.exec(value);
+  if (fromUrl) value = fromUrl[1];
+  return value.replace(/^@+/, '').replace(/\/+$/, '');
+}
+
+export function isValidInstagram(handle: string): boolean {
+  return /^[A-Za-z0-9._]{1,30}$/.test(handle);
+}
+
+export function instagramLink(handle: string): string {
+  return `https://instagram.com/${encodeURIComponent(handle)}`;
+}
+
 export function slugify(text: string): string {
   return text
     .normalize('NFD')

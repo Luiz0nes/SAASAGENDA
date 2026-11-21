@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { Button, Card, Field, PageHeader, Toggle } from '../../components/ui';
 import { useToast } from '../../components/Toast';
-import { formatPhone, onlyDigits } from '../../lib/format';
+import { formatPhone, instagramHandle, isValidInstagram, onlyDigits } from '../../lib/format';
 import { errorMessage, supabase, unwrap } from '../../lib/supabase';
 import { useEstablishment } from './EstablishmentContext';
 
@@ -18,6 +18,7 @@ export function SettingsPage() {
     state: establishment.state ?? '',
     phone: formatPhone(establishment.phone),
     whatsapp: formatPhone(establishment.whatsapp),
+    instagram: establishment.instagram ? `@${establishment.instagram}` : '',
     email: establishment.email ?? '',
     slotInterval: String(establishment.slot_interval_minutes),
     minAdvance: String(establishment.min_advance_minutes),
@@ -44,6 +45,8 @@ export function SettingsPage() {
     if (numbers.slot_interval_minutes < 5 || numbers.slot_interval_minutes > 240) return toast.error('O intervalo entre horários deve ficar entre 5 e 240 minutos.');
     if (numbers.max_advance_days < 1 || numbers.max_advance_days > 365) return toast.error('A antecedência máxima deve ficar entre 1 e 365 dias.');
     if (numbers.max_active_per_customer < 1 || numbers.max_active_per_customer > 50) return toast.error('O limite por cliente deve ficar entre 1 e 50.');
+    const instagram = instagramHandle(form.instagram);
+    if (instagram && !isValidInstagram(instagram)) return toast.error('Instagram inválido. Use só o nome de usuário, por exemplo @minhabarbearia.');
 
     setSaving(true);
     try {
@@ -59,6 +62,7 @@ export function SettingsPage() {
             state: form.state.trim() || null,
             phone: onlyDigits(form.phone) || null,
             whatsapp: onlyDigits(form.whatsapp) || null,
+            instagram: instagram || null,
             email: form.email.trim() || null,
             auto_confirm: form.autoConfirm,
             ...numbers,
@@ -108,12 +112,15 @@ export function SettingsPage() {
 
       <Card className="mt-4 p-4">
         <h2 className="mb-4 text-sm font-semibold text-slate-900">Contato e WhatsApp</h2>
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Field label="Telefone">
             <input className="input" inputMode="tel" value={form.phone} onChange={(e) => set('phone', e.target.value)} />
           </Field>
           <Field label="WhatsApp (com DDD)" hint="Usado nos botões de contato e confirmação.">
             <input className="input" inputMode="tel" value={form.whatsapp} onChange={(e) => set('whatsapp', e.target.value)} />
+          </Field>
+          <Field label="Instagram" hint="Seu @ ou o link do perfil. Aparece como botão na página.">
+            <input className="input" placeholder="@minhabarbearia" autoCapitalize="off" autoCorrect="off" value={form.instagram} onChange={(e) => set('instagram', e.target.value)} />
           </Field>
           <Field label="E-mail">
             <input className="input" type="email" value={form.email} onChange={(e) => set('email', e.target.value)} />

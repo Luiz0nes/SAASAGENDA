@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, CheckCircle2, Clock, MapPin, MessageCircle, Moon, Phone, Sun, UserRound } from 'lucide-react';
 import { SlotPicker } from '../../components/SlotPicker';
 import {
-  formatDate, formatDuration, formatMoney, formatPhone, formatTime, todayInZone, trimTime, weekdayOf, WEEKDAYS, whatsappLink,
+  formatDate, formatDuration, formatMoney, formatPhone, formatTime, instagramLink, todayInZone, trimTime, weekdayOf, WEEKDAYS, whatsappLink,
 } from '../../lib/format';
 import { errorMessage, supabase, unwrap } from '../../lib/supabase';
 import { initialMode, loadFonts, normalizeTheme, storeMode, themeVars, type ResolvedMode } from '../../lib/theme';
@@ -21,6 +21,16 @@ export interface BookingViewProps {
   preview?: boolean;
   /** modo imposto pelo editor de tema (pré-visualização) */
   forcedMode?: ResolvedMode;
+}
+
+function InstagramIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <rect x="2" y="2" width="20" height="20" rx="5" />
+      <circle cx="12" cy="12" r="4" />
+      <circle cx="17.5" cy="6.5" r="0.6" fill="currentColor" />
+    </svg>
+  );
 }
 
 function initials(name: string): string {
@@ -614,16 +624,16 @@ export function BookingView({ data, loadSlots, preview = false, forcedMode }: Bo
                   </li>
                 )}
               </ul>
-              {est.whatsapp && (
+              {est.instagram && (
                 <a
-                  href={whatsappLink(est.whatsapp, `Olá! Vim pela página de agendamento de ${est.name}.`)}
+                  href={instagramLink(est.instagram)}
                   target="_blank"
                   rel="noreferrer"
-                  className="mt-4 flex w-full items-center justify-center gap-2 border border-emerald-500 px-4 py-2.5 text-sm font-semibold text-emerald-600 hover:bg-emerald-500/10"
-                  style={{ borderRadius: 'var(--r-btn)' }}
+                  className="mt-4 flex w-full items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white shadow-md transition hover:brightness-110"
+                  style={{ borderRadius: 'var(--r-btn)', backgroundImage: 'linear-gradient(45deg, #f58529 0%, #dd2a7b 50%, #8134af 100%)' }}
                 >
-                  <MessageCircle className="h-4 w-4" />
-                  Falar pelo WhatsApp
+                  <InstagramIcon />
+                  Seguir @{est.instagram} no Instagram
                 </a>
               )}
               {data.business_hours.length > 0 && (

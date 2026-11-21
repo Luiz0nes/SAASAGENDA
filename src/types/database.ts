@@ -58,6 +58,8 @@ export interface Establishment {
   state: string | null;
   phone: string | null;
   whatsapp: string | null;
+  /** nome de usuário, sem @ */
+  instagram: string | null;
   email: string | null;
   logo_url: string | null;
   cover_url: string | null;
@@ -225,7 +227,7 @@ export interface PublicEstablishmentData {
   establishment: Pick<
     Establishment,
     | 'id' | 'name' | 'slug' | 'segment' | 'description' | 'address' | 'city' | 'state' | 'phone'
-    | 'whatsapp' | 'logo_url' | 'cover_url' | 'timezone' | 'max_advance_days'
+    | 'whatsapp' | 'instagram' | 'logo_url' | 'cover_url' | 'timezone' | 'max_advance_days'
     | 'min_advance_minutes' | 'cancellation_min_minutes' | 'auto_confirm'
   >;
   theme: Theme | null;
