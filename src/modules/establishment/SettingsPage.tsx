@@ -111,7 +111,7 @@ export function SettingsPage() {
       </Card>
 
       <Card className="mt-4 p-4">
-        <h2 className="mb-4 text-sm font-semibold text-slate-900">Contato e WhatsApp</h2>
+        <h2 className="mb-4 text-sm font-semibold text-slate-900">Contato e redes sociais</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Field label="Telefone">
             <input className="input" inputMode="tel" value={form.phone} onChange={(e) => set('phone', e.target.value)} />
