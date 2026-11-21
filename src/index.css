@@ -204,7 +204,9 @@
   to { transform: translateX(350%) skewX(-20deg); }
 }
 @keyframes hero-stripes {
-  to { background-position: 79.2px 0; }
+  /* 79,2 px = um ciclo completo das listras a 45° (56 px / cos 45°) */
+  from { transform: translate3d(-79.2px, 0, 0); }
+  to { transform: translate3d(0, 0, 0); }
 }
 
 @layer components {
@@ -291,6 +293,17 @@
   .pub[data-hero='dynamic'] .hero-stripes {
     display: block;
     height: 6px;
+    overflow: hidden;
+  }
+  /* uma faixa um ciclo mais larga, deslizada com transform (roda na GPU
+     e não deixa emenda em telas largas) */
+  .pub[data-hero='dynamic'] .hero-stripes::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: calc(100% + 80px);
     background-image: repeating-linear-gradient(
       -45deg,
       var(--c-accent) 0 14px,
@@ -299,6 +312,7 @@
       #ffffff 42px 56px
     );
     animation: hero-stripes 1.4s linear infinite;
+    will-change: transform;
   }
 }
 
@@ -310,7 +324,7 @@
   .pub .hero-cover,
   .pub .hero-gradient,
   .pub .hero-line,
-  .pub .hero-stripes,
+  .pub .hero-stripes::before,
   .pub .hero-shine::after {
     animation: none !important;
   }

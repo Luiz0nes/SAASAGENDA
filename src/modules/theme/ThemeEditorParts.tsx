@@ -348,13 +348,16 @@ function HeroSketch({ value, theme }: { value: HeroAnimation; theme: Theme }) {
         <span className="block h-1.5 w-12 rounded-full" style={{ backgroundColor: theme.secondary_color }} />
       </div>
       {value === 'dynamic' && (
-        <div
-          className="absolute inset-x-0 bottom-0 h-1.5"
-          style={{
-            backgroundImage: `repeating-linear-gradient(-45deg, ${theme.secondary_color} 0 7px, #ffffff 7px 14px, ${theme.primary_color} 14px 21px, #ffffff 21px 28px)`,
-            animation: 'hero-stripes 1.4s linear infinite',
-          }}
-        />
+        <div className="absolute inset-x-0 bottom-0 h-1.5 overflow-hidden">
+          <div
+            className="h-full"
+            style={{
+              width: 'calc(100% + 80px)',
+              backgroundImage: `repeating-linear-gradient(-45deg, ${theme.secondary_color} 0 14px, #ffffff 14px 28px, ${theme.primary_color} 28px 42px, #ffffff 42px 56px)`,
+              animation: 'hero-stripes 1.4s linear infinite',
+            }}
+          />
+        </div>
       )}
     </div>
   );
