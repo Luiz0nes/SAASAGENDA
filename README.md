@@ -105,4 +105,4 @@ O navegador nunca calcula disponibilidade nem grava horários diretamente pela p
 | `npm run typecheck` | checagem de tipos |
 | `npm run build` | checagem de tipos + build de produção em `dist/` |
 
-Hospedagem: o passo a passo do Cloudflare Pages está em **[docs/DEPLOY_CLOUDFLARE.md](docs/DEPLOY_CLOUDFLARE.md)**. Funciona em qualquer serviço de site estático: `vercel.json` e `public/_redirects` já redirecionam todas as rotas para `index.html`, e `public/_headers` define cabeçalhos de segurança e cache.
+Hospedagem: o passo a passo do Cloudflare Pages está em **[docs/DEPLOY_CLOUDFLARE.md](docs/DEPLOY_CLOUDFLARE.md)**. Funciona em qualquer serviço de site estático: `wrangler.jsonc` (Cloudflare) e `vercel.json` (Vercel) já direcionam todas as rotas para `index.html`, e `public/_headers` define cabeçalhos de segurança e cache.

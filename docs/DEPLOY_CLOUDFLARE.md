@@ -4,7 +4,7 @@ O Cloudflare Pages lê o repositório do GitHub, roda o build e publica o site. 
 
 O que já está pronto no repositório:
 
-- `public/_redirects`: faz as rotas do React (`/agendar/...`, `/painel/...`) funcionarem ao abrir o link direto ou recarregar a página.
+- `wrangler.jsonc`: publica a pasta `dist` e faz as rotas do React (`/agendar/...`, `/painel/...`) funcionarem ao abrir o link direto ou recarregar a página.
 - `public/_headers`: cabeçalhos de segurança e cache.
 - `.nvmrc`: usa Node 20 no build.
 
@@ -26,6 +26,19 @@ Deve terminar com uma linha `✓ built in ...`. Se aparecer erro, mande o print 
 4. Escolha o repositório e clique em **Begin setup**.
 
 ## 2. Configurar o build
+
+> O Cloudflare hoje abre por padrão o fluxo de **Workers** (campos *Build command*, *Deploy command* e *Preview command*). Use assim:
+>
+> | Campo | Valor |
+> | --- | --- |
+> | Project name | `saasagenda` (igual ao `name` do `wrangler.jsonc`) |
+> | Build command | `npm run build` |
+> | Deploy command | `npx wrangler deploy` |
+> | Preview command | `npx wrangler versions upload` (ou deixe o padrão) |
+>
+> As variáveis `VITE_...` vão em **Advanced settings → Build variables** (são usadas durante o build). Se não aparecer na criação, cadastre depois em **Settings → Build → Variables and secrets** e clique em **Retry build**. O endereço fica `https://saasagenda.SEU-SUBDOMINIO.workers.dev`.
+>
+> Se preferir o fluxo antigo de **Pages**, a tabela abaixo vale para ele.
 
 | Campo | Valor |
 | --- | --- |
@@ -76,5 +89,5 @@ Depois, troque o **Site URL** e o **Redirect URL** do Supabase para o domínio n
 | --- | --- |
 | Build falha com erro de TypeScript | Rode `npm run build` no seu computador e mande o erro |
 | Site abre, mas a tela de login avisa para configurar o `.env` | Variáveis `VITE_...` não cadastradas, ou cadastradas depois do build: em **Deployments**, clique em **Retry deployment** |
-| 404 ao recarregar uma página interna | `public/_redirects` ausente no deploy |
+| 404 ao recarregar uma página interna | `wrangler.jsonc` ausente ou sem `not_found_handling` |
 | Link de recuperação de senha abre o localhost | Site URL / Redirect URLs do Supabase não atualizados |

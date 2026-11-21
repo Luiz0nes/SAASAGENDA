@@ -1,0 +1,11 @@
+// Publicação no Cloudflare (Workers com arquivos estáticos).
+// O build do Vite gera ./dist; o Cloudflare só serve esses arquivos.
+{
+  "name": "saasagenda",
+  "compatibility_date": "2025-09-01",
+  "assets": {
+    "directory": "./dist",
+    // rotas do React (/agendar/..., /painel/...) abrem o index.html
+    "not_found_handling": "single-page-application"
+  }
+}
