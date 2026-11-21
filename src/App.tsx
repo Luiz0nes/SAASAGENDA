@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { ForgotPasswordPage, LoginPage, NoAccessPage, ResetPasswordPage } from './modules/auth/AuthPages';
 import { RequireAuth, RequireMembership, RequireSuperAdmin } from './modules/auth/guards';
 import { AppointmentsPage } from './modules/establishment/AppointmentsPage';
+import { CustomerPlansPage } from './modules/establishment/CustomerPlansPage';
 import { CustomersPage } from './modules/establishment/CustomersPage';
 import { DashboardPage } from './modules/establishment/DashboardPage';
 import { EstablishmentLayout } from './modules/establishment/EstablishmentLayout';
@@ -75,6 +76,7 @@ export default function App() {
         <Route path="agenda" element={<AppointmentsPage />} />
         <Route path="clientes" element={<CustomersPage />} />
         <Route path="servicos" element={<ServicesPage />} />
+        <Route path="planos" element={<CustomerPlansPage />} />
         <Route path="profissionais" element={<ProfessionalsPage />} />
         <Route path="horarios" element={<HoursPage />} />
         <Route path="personalizacao" element={<ThemePage />} />

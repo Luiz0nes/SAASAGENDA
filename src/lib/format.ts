@@ -30,6 +30,11 @@ export function formatMoney(cents: number): string {
   return (cents / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
 
+/** 11000 -> "110" e 4550 -> "45,50" (sem o "R$", para destacar o número) */
+export function formatAmount(cents: number): string {
+  return (cents / 100).toLocaleString('pt-BR', { minimumFractionDigits: cents % 100 === 0 ? 0 : 2, maximumFractionDigits: 2 });
+}
+
 /** "45,90" | "45.90" | "45" -> 4590 (ou null se inválido) */
 export function parseMoney(text: string): number | null {
   const normalized = text.trim().replace(/\./g, '').replace(',', '.');

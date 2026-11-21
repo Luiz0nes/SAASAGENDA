@@ -4,7 +4,7 @@ import { ErrorBox, Spinner } from '../../components/ui';
 import { supabase, unwrap } from '../../lib/supabase';
 import { normalizeTheme } from '../../lib/theme';
 import { useLoad } from '../../lib/useLoad';
-import type { BusinessHour, Establishment, Professional, PublicEstablishmentData, Service, Theme } from '../../types/database';
+import type { BusinessHour, CustomerPlan, Establishment, Professional, PublicEstablishmentData, Service, Theme } from '../../types/database';
 import { isEditorMessage, type EditorMessage } from '../theme/previewProtocol';
 import { BookingView } from './BookingView';
 import { fetchAdminSlots } from './publicApi';
@@ -15,13 +15,14 @@ import { fetchAdminSlots } from './publicApi';
  * estabelecimento suspenso, para o dono conseguir ajustar o visual.
  */
 async function fetchPreviewData(establishmentId: string): Promise<PublicEstablishmentData> {
-  const [est, theme, services, professionals, links, hours] = await Promise.all([
+  const [est, theme, services, professionals, links, hours, plans] = await Promise.all([
     supabase.from('establishments').select('*').eq('id', establishmentId).single(),
     supabase.from('establishment_themes').select('*').eq('establishment_id', establishmentId).maybeSingle(),
     supabase.from('services').select('*').eq('establishment_id', establishmentId).eq('is_active', true).order('sort_order').order('name'),
     supabase.from('professionals').select('*').eq('establishment_id', establishmentId).eq('is_active', true).order('name'),
     supabase.from('professional_services').select('professional_id, service_id').eq('establishment_id', establishmentId),
     supabase.from('business_hours').select('*').eq('establishment_id', establishmentId).order('weekday'),
+    supabase.from('customer_plans').select('*').eq('establishment_id', establishmentId).eq('is_active', true).order('sort_order').order('name'),
   ]);
   const e = unwrap<Establishment>(est);
   const pros = unwrap<Professional[]>(professionals);
@@ -32,6 +33,7 @@ async function fetchPreviewData(establishmentId: string): Promise<PublicEstablis
     establishment: e,
     theme: normalizeTheme(unwrap<Theme | null>(theme)),
     business_hours: unwrap<BusinessHour[]>(hours),
+    customer_plans: unwrap<CustomerPlan[]>(plans),
     services: unwrap<Service[]>(services).filter((s) => pairs.some((l) => l.service_id === s.id && activeIds.has(l.professional_id))),
     professionals: pros.map((p) => ({
       id: p.id,

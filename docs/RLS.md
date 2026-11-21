@@ -47,6 +47,7 @@ Padrão ao criar: recepcionista recebe `manage_appointments` e `manage_customers
 | `professional_schedules` | membro | perm `manage_schedules`, ou o próprio profissional |
 | `blocked_times` | membro | perm `manage_schedules`, ou o próprio profissional (só bloqueios dele) |
 | `establishment_themes` | membro | perm `manage_theme` (e recurso `custom_theme` do plano, por trigger) |
+| `customer_plans` | membro | perm `manage_services` (o visitante vê só os ativos, via `get_public_establishment`) |
 | `notifications` | perm `manage_appointments` | somente backend |
 | `audit_logs` | SuperAdmin (tudo); proprietário/admin (do próprio estabelecimento) | somente triggers |
 | `platform_settings` | SuperAdmin | SuperAdmin |

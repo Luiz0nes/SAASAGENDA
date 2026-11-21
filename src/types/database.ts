@@ -60,6 +60,8 @@ export interface Establishment {
   whatsapp: string | null;
   /** nome de usuário, sem @ */
   instagram: string | null;
+  /** texto "Como funciona" exibido abaixo dos planos mensais */
+  plans_note: string | null;
   email: string | null;
   logo_url: string | null;
   cover_url: string | null;
@@ -207,6 +209,27 @@ export interface Slot {
   slot_start: string;
 }
 
+export interface CustomerPlanOption {
+  label: string;
+  price_cents: number;
+  note: string | null;
+}
+
+/** Plano mensal que o estabelecimento oferece aos clientes (vitrine). */
+export interface CustomerPlan {
+  id: string;
+  establishment_id: string;
+  name: string;
+  tagline: string | null;
+  options: CustomerPlanOption[];
+  benefits: string | null;
+  highlight: boolean;
+  sort_order: number;
+  is_active: boolean;
+}
+
+export type PublicCustomerPlan = Pick<CustomerPlan, 'id' | 'name' | 'tagline' | 'options' | 'benefits' | 'highlight'>;
+
 export interface PublicService {
   id: string;
   name: string;
@@ -230,13 +253,14 @@ export interface PublicEstablishmentData {
   establishment: Pick<
     Establishment,
     | 'id' | 'name' | 'slug' | 'segment' | 'description' | 'address' | 'city' | 'state' | 'phone'
-    | 'whatsapp' | 'instagram' | 'logo_url' | 'cover_url' | 'timezone' | 'max_advance_days'
+    | 'whatsapp' | 'instagram' | 'plans_note' | 'logo_url' | 'cover_url' | 'timezone' | 'max_advance_days'
     | 'min_advance_minutes' | 'cancellation_min_minutes' | 'auto_confirm'
   >;
   theme: Theme | null;
   business_hours: Pick<BusinessHour, 'weekday' | 'opens_at' | 'closes_at' | 'is_closed'>[];
   services: PublicService[];
   professionals: PublicProfessional[];
+  customer_plans: PublicCustomerPlan[];
 }
 
 export interface PublicAppointment {

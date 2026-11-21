@@ -10,6 +10,7 @@ import {
 import { errorMessage, supabase, unwrap } from '../../lib/supabase';
 import { initialMode, loadFonts, normalizeTheme, storeMode, themeVars, type ResolvedMode } from '../../lib/theme';
 import type { PublicAppointment, PublicEstablishmentData, PublicProfessional, PublicService, Slot, Theme } from '../../types/database';
+import { PlansSection } from './PlansSection';
 import { appointmentMessage, saveToken } from './publicApi';
 
 type Step = 'service' | 'professional' | 'slot' | 'details' | 'done';
@@ -577,6 +578,8 @@ export function BookingView({ data, loadSlots, preview = false, forcedMode }: Bo
                 </div>
               )}
             </section>
+
+            <PlansSection data={data} />
 
             {theme.gallery.length > 0 && (
               <section>
