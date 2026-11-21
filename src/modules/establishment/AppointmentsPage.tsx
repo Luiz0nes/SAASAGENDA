@@ -1,12 +1,13 @@
 import { useState } from 'react';
-import { ChevronLeft, ChevronRight, MessageCircle, Plus, StickyNote } from 'lucide-react';
+import { MessageCircle, Plus, StickyNote } from 'lucide-react';
 import { Badge, Button, Card, ConfirmModal, EmptyState, ErrorBox, PageHeader, Spinner } from '../../components/ui';
 import { useToast } from '../../components/Toast';
-import { addDays, formatDateLong, formatMoney, formatPhone, formatTime, STATUS_LABEL, todayInZone, whatsappLink, zonedToIso } from '../../lib/format';
+import { addDays, dateInZone, formatDateLong, formatMoney, formatPhone, formatTime, STATUS_LABEL, todayInZone, whatsappLink, zonedToIso } from '../../lib/format';
 import { errorMessage, supabase, unwrap } from '../../lib/supabase';
 import { useLoad } from '../../lib/useLoad';
 import type { AppointmentStatus, AppointmentWithRelations, Professional, Service } from '../../types/database';
 import { NewAppointmentModal, NotesModal, RescheduleModal, type AgendaCatalog } from './AppointmentModals';
+import { DayStrip, type DayCount } from './DayStrip';
 import { useEstablishment } from './EstablishmentContext';
 
 export const STATUS_TONE: Record<AppointmentStatus, 'yellow' | 'blue' | 'green' | 'red' | 'gray'> = {
@@ -30,6 +31,9 @@ export function AppointmentsPage() {
   const toast = useToast();
   const tz = establishment.timezone;
   const [date, setDate] = useState(() => todayInZone(tz));
+  // primeiro dia da faixa de 14 dias exibida em botões
+  const [stripStart, setStripStart] = useState(() => todayInZone(tz));
+  const STRIP_DAYS = 14;
   const [professionalFilter, setProfessionalFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [creating, setCreating] = useState(false);
@@ -64,6 +68,38 @@ export function AppointmentsPage() {
     return unwrap<AppointmentWithRelations[]>(await query);
   }, [establishment.id, date, professionalFilter, statusFilter, tz]);
 
+  // quantidade de agendamentos por dia, para as notificações nos botões
+  const counts = useLoad<Record<string, DayCount>>(async () => {
+    let query = supabase
+      .from('appointments')
+      .select('starts_at, status')
+      .eq('establishment_id', establishment.id)
+      .in('status', ['pending', 'confirmed', 'completed'])
+      .gte('starts_at', zonedToIso(stripStart, '00:00', tz))
+      .lt('starts_at', zonedToIso(addDays(stripStart, STRIP_DAYS), '00:00', tz));
+    if (professionalFilter) query = query.eq('professional_id', professionalFilter);
+    const rows = unwrap<{ starts_at: string; status: AppointmentStatus }[]>(await query);
+    const result: Record<string, DayCount> = {};
+    for (const row of rows) {
+      const day = dateInZone(new Date(row.starts_at), tz);
+      const entry = (result[day] ??= { total: 0, pending: 0 });
+      entry.total += 1;
+      if (row.status === 'pending') entry.pending += 1;
+    }
+    return result;
+  }, [establishment.id, stripStart, professionalFilter, tz]);
+
+  function selectDate(next: string) {
+    setDate(next);
+    // se a data escolhida estiver fora da faixa, a faixa passa a começar nela
+    if (next < stripStart || next >= addDays(stripStart, STRIP_DAYS)) setStripStart(next);
+  }
+
+  function refreshAll() {
+    void list.reload();
+    void counts.reload();
+  }
+
   function ask(appointment: AppointmentWithRelations, status: AppointmentStatus) {
     const who = appointment.customer?.name ?? 'cliente';
     const when = formatTime(appointment.starts_at, tz);
@@ -86,7 +122,7 @@ export function AppointmentsPage() {
       unwrap(await supabase.from('appointments').update(patch).eq('id', action.appointment.id));
       toast.success('Agendamento atualizado.');
       setAction(null);
-      await list.reload();
+      refreshAll();
     } catch (err) {
       toast.error(errorMessage(err));
     } finally {
@@ -110,19 +146,36 @@ export function AppointmentsPage() {
         }
       />
 
-      <Card className="mb-4 p-3">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex items-center gap-2">
-            <Button variant="secondary" size="sm" onClick={() => setDate(addDays(date, -1))} aria-label="Dia anterior" icon={<ChevronLeft className="h-4 w-4" />} />
-            <input type="date" className="input w-auto" value={date} onChange={(e) => e.target.value && setDate(e.target.value)} />
-            <Button variant="secondary" size="sm" onClick={() => setDate(addDays(date, 1))} aria-label="Próximo dia" icon={<ChevronRight className="h-4 w-4" />} />
+      <Card className="mb-4 p-3 sm:p-4">
+        <DayStrip
+          start={stripStart}
+          days={STRIP_DAYS}
+          today={today}
+          selected={date}
+          counts={counts.data ?? {}}
+          loading={counts.loading}
+          onSelect={selectDate}
+          onShift={(n) => setStripStart(addDays(stripStart, n))}
+        />
+
+        <div className="mt-4 flex flex-col gap-3 border-t border-slate-100 pt-3 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="text-sm font-semibold text-slate-900">{formatDateLong(date).charAt(0).toUpperCase() + formatDateLong(date).slice(1)}</p>
             {date !== today && (
-              <Button variant="ghost" size="sm" onClick={() => setDate(today)}>
-                Hoje
+              <Button variant="ghost" size="sm" onClick={() => selectDate(today)}>
+                Voltar para hoje
               </Button>
             )}
           </div>
-          <div className="grid grid-cols-2 gap-2 lg:flex">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 lg:flex">
+            <input
+              type="date"
+              className="input lg:w-40"
+              value={date}
+              onChange={(e) => e.target.value && selectDate(e.target.value)}
+              aria-label="Ir para uma data"
+              title="Ir para uma data"
+            />
             <select className="input lg:w-48" value={professionalFilter} onChange={(e) => setProfessionalFilter(e.target.value)} aria-label="Filtrar por profissional">
               <option value="">Todos os profissionais</option>
               {catalog.data?.professionals.map((p) => (
@@ -141,7 +194,6 @@ export function AppointmentsPage() {
             </select>
           </div>
         </div>
-        <p className="mt-2 text-sm font-medium capitalize text-slate-700">{formatDateLong(date)}</p>
       </Card>
 
       {list.loading && <Spinner />}
@@ -228,7 +280,7 @@ export function AppointmentsPage() {
           onClose={() => setCreating(false)}
           onSaved={() => {
             setCreating(false);
-            void list.reload();
+            refreshAll();
           }}
         />
       )}
@@ -240,7 +292,7 @@ export function AppointmentsPage() {
           onClose={() => setRescheduling(null)}
           onSaved={() => {
             setRescheduling(null);
-            void list.reload();
+            refreshAll();
           }}
         />
       )}
