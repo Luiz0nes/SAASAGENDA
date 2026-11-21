@@ -329,3 +329,91 @@
     animation: none !important;
   }
 }
+
+/* ---------------------------------------------------------------------
+   Modo escuro do PAINEL (botão no menu lateral). Só vale dentro de
+   .panel-dark: as páginas públicas e o login não são afetados.
+   Áreas que precisam continuar claras (ex.: cartaz do QR Code, que é
+   impresso) usam a classe .keep-light.
+   --------------------------------------------------------------------- */
+.panel-dark {
+  background-color: #0b1120;
+  color: #e2e8f0;
+  color-scheme: dark;
+}
+.panel-dark .input:not(.keep-light, .keep-light *) {
+  background-color: #0e1625;
+  border-color: #334155;
+  color: #f1f5f9;
+}
+.panel-dark .input:not(.keep-light, .keep-light *)::placeholder {
+  color: #64748b;
+}
+.panel-dark .input:not(.keep-light, .keep-light *):focus {
+  border-color: #e2e8f0;
+  --tw-ring-color: rgba(226, 232, 240, 0.15);
+}
+.panel-dark .input:not(.keep-light, .keep-light *):disabled {
+  background-color: #1a2436;
+  color: #8d9bb0;
+}
+.panel-dark .keep-light {
+  color-scheme: light;
+}
+.panel-dark .bg-white:not(.keep-light, .keep-light *) { background-color: #111a2b; }
+.panel-dark .bg-slate-50:not(.keep-light, .keep-light *) { background-color: #0e1625; }
+.panel-dark .bg-slate-100:not(.keep-light, .keep-light *) { background-color: #1a2436; }
+.panel-dark .bg-slate-300:not(.keep-light, .keep-light *) { background-color: #3a4659; }
+.panel-dark .bg-slate-400:not(.keep-light, .keep-light *) { background-color: #56637a; }
+.panel-dark .bg-slate-900:not(.keep-light, .keep-light *) { background-color: #e8edf4; }
+.panel-dark .bg-amber-50:not(.keep-light, .keep-light *) { background-color: rgba(245,158,11,0.12); }
+.panel-dark .bg-amber-100:not(.keep-light, .keep-light *) { background-color: rgba(245,158,11,0.18); }
+.panel-dark .bg-red-50:not(.keep-light, .keep-light *) { background-color: rgba(239,68,68,0.12); }
+.panel-dark .bg-red-100:not(.keep-light, .keep-light *) { background-color: rgba(239,68,68,0.18); }
+.panel-dark .bg-emerald-100:not(.keep-light, .keep-light *) { background-color: rgba(16,185,129,0.18); }
+.panel-dark .bg-sky-100:not(.keep-light, .keep-light *) { background-color: rgba(14,165,233,0.18); }
+.panel-dark .bg-white\/90:not(.keep-light, .keep-light *) { background-color: rgba(17,26,43,0.9); }
+.panel-dark .bg-white\/60:not(.keep-light, .keep-light *) { background-color: rgba(17,26,43,0.6); }
+.panel-dark .hover\:bg-slate-50:hover:not(.keep-light, .keep-light *) { background-color: #172133; }
+.panel-dark .hover\:bg-slate-100:hover:not(.keep-light, .keep-light *) { background-color: #1f2a3d; }
+.panel-dark .hover\:bg-slate-800:hover:not(.keep-light, .keep-light *) { background-color: #ffffff; }
+.panel-dark .hover\:bg-white:hover:not(.keep-light, .keep-light *) { background-color: #1a2436; }
+.panel-dark .text-slate-900:not(.keep-light, .keep-light *) { color: #f1f5f9; }
+.panel-dark .text-slate-800:not(.keep-light, .keep-light *) { color: #e2e8f0; }
+.panel-dark .text-slate-700:not(.keep-light, .keep-light *) { color: #cbd5e1; }
+.panel-dark .text-slate-600:not(.keep-light, .keep-light *) { color: #aab6c8; }
+.panel-dark .text-slate-500:not(.keep-light, .keep-light *) { color: #8d9bb0; }
+.panel-dark .text-slate-400:not(.keep-light, .keep-light *) { color: #6b7a90; }
+.panel-dark .text-emerald-700:not(.keep-light, .keep-light *) { color: #34d399; }
+.panel-dark .text-emerald-800:not(.keep-light, .keep-light *) { color: #6ee7b7; }
+.panel-dark .text-amber-700:not(.keep-light, .keep-light *) { color: #fbbf24; }
+.panel-dark .text-amber-800:not(.keep-light, .keep-light *) { color: #fcd34d; }
+.panel-dark .text-amber-900:not(.keep-light, .keep-light *) { color: #fde68a; }
+.panel-dark .text-red-800:not(.keep-light, .keep-light *) { color: #fca5a5; }
+.panel-dark .text-red-600:not(.keep-light, .keep-light *) { color: #f87171; }
+.panel-dark .text-sky-800:not(.keep-light, .keep-light *) { color: #7dd3fc; }
+.panel-dark .hover\:text-slate-900:hover:not(.keep-light, .keep-light *) { color: #ffffff; }
+.panel-dark .hover\:text-slate-700:hover:not(.keep-light, .keep-light *) { color: #e2e8f0; }
+.panel-dark .bg-slate-900.text-white:not(.keep-light, .keep-light *) { color: #0b1120; }
+.panel-dark .bg-slate-900.text-white:not(.keep-light, .keep-light *) { color: #0b1120; }
+.panel-dark .bg-slate-900 .text-white\/80:not(.keep-light, .keep-light *) { color: rgba(11,17,32,0.75); }
+.panel-dark .bg-slate-900 .text-white\/70:not(.keep-light, .keep-light *) { color: rgba(11,17,32,0.6); }
+.panel-dark .bg-slate-900 .text-slate-300:not(.keep-light, .keep-light *) { color: #334155; }
+.panel-dark .bg-slate-900 .hover\:text-white:hover:not(.keep-light, .keep-light *) { color: #0b1120; }
+.panel-dark .bg-slate-900 .hover\:bg-white\/10:hover:not(.keep-light, .keep-light *) { background-color: rgba(11,17,32,0.07); }
+.panel-dark .border-slate-100:not(.keep-light, .keep-light *) { border-color: #1c2638; }
+.panel-dark .border-slate-200:not(.keep-light, .keep-light *) { border-color: #253047; }
+.panel-dark .border-slate-300:not(.keep-light, .keep-light *) { border-color: #334155; }
+.panel-dark .border-slate-900:not(.keep-light, .keep-light *) { border-color: #e2e8f0; }
+.panel-dark .border-red-200:not(.keep-light, .keep-light *) { border-color: rgba(239,68,68,0.35); }
+.panel-dark .border-white:not(.keep-light, .keep-light *) { border-color: #111a2b; }
+.panel-dark .border-slate-700:not(.keep-light, .keep-light *) { border-color: #94a3b8; }
+.panel-dark .hover\:border-slate-400:hover:not(.keep-light, .keep-light *) { border-color: #64748b; }
+.panel-dark .hover\:border-slate-500:hover:not(.keep-light, .keep-light *) { border-color: #7c8aa0; }
+.panel-dark .focus\:border-slate-900:focus:not(.keep-light, .keep-light *) { border-color: #e2e8f0; }
+.panel-dark .divide-slate-100:not(.keep-light, .keep-light *) > :not([hidden]) ~ :not([hidden]) { border-color: #1c2638; }
+.panel-dark .ring-slate-200:not(.keep-light, .keep-light *) { --tw-ring-color: #253047; }
+.panel-dark .ring-slate-900\/10:not(.keep-light, .keep-light *) { --tw-ring-color: rgba(226,232,240,0.15); }
+.panel-dark .ring-slate-900\/20:not(.keep-light, .keep-light *) { --tw-ring-color: rgba(226,232,240,0.25); }
+.panel-dark .ring-white:not(.keep-light, .keep-light *) { --tw-ring-color: #111a2b; }
+.panel-dark .ring-black\/10:not(.keep-light, .keep-light *) { --tw-ring-color: rgba(255,255,255,0.1); }

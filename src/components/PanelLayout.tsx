@@ -1,6 +1,6 @@
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { CalendarCheck, LogOut, Menu, X } from 'lucide-react';
+import { CalendarCheck, LogOut, Menu, Moon, Sun, X } from 'lucide-react';
 import { useAuth } from '../modules/auth/AuthContext';
 
 export interface NavItem {
@@ -18,10 +18,66 @@ interface Props {
   extra?: ReactNode;
 }
 
+const PANEL_MODE_KEY = 'agenda.panelMode';
+
+function readPanelDark(): boolean {
+  try {
+    const saved = window.localStorage.getItem(PANEL_MODE_KEY);
+    if (saved === 'dark' || saved === 'light') return saved === 'dark';
+  } catch {
+    // sem armazenamento: segue o sistema
+  }
+  return window.matchMedia?.('(prefers-color-scheme: dark)').matches === true;
+}
+
+/** Botão claro/escuro do painel (a escolha fica salva neste aparelho). */
+function ModeButton({ dark, onToggle, compact = false }: { dark: boolean; onToggle: () => void; compact?: boolean }) {
+  const label = dark ? 'Modo claro' : 'Modo escuro';
+  if (compact) {
+    return (
+      <button type="button" onClick={onToggle} className="rounded-lg p-2 text-slate-700 hover:bg-slate-100" aria-label={`Ativar ${label.toLowerCase()}`} aria-pressed={dark}>
+        {dark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+      </button>
+    );
+  }
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      aria-pressed={dark}
+      className="flex w-full items-center justify-between gap-3 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+    >
+      <span className="flex items-center gap-3">
+        {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+        {label}
+      </span>
+      <span className={`relative h-5 w-9 shrink-0 rounded-full transition ${dark ? 'bg-slate-900' : 'bg-slate-300'}`} aria-hidden>
+        <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all ${dark ? 'left-[18px]' : 'left-0.5'}`} />
+      </span>
+    </button>
+  );
+}
+
 /** Estrutura dos painéis: navegação lateral no desktop, gaveta no celular. */
 export function PanelLayout({ title, subtitle, items, banner, extra }: Props) {
   const [open, setOpen] = useState(false);
+  const [dark, setDark] = useState(readPanelDark);
   const { profile, signOut } = useAuth();
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(PANEL_MODE_KEY, dark ? 'dark' : 'light');
+    } catch {
+      // ignora: a escolha vale até fechar a página
+    }
+    // fundo do navegador (rolagem além da página) acompanha o modo
+    document.body.style.backgroundColor = dark ? '#0b1120' : '';
+    return () => {
+      document.body.style.backgroundColor = '';
+    };
+  }, [dark]);
+
+  const toggleDark = () => setDark((d) => !d);
   const navigate = useNavigate();
 
   async function handleSignOut() {
@@ -58,6 +114,9 @@ export function PanelLayout({ title, subtitle, items, banner, extra }: Props) {
       </nav>
       {extra && <div className="px-3 py-2">{extra}</div>}
       <div className="border-t border-slate-200 p-3">
+        <div className="mb-2">
+          <ModeButton dark={dark} onToggle={toggleDark} />
+        </div>
         <p className="truncate px-3 text-xs text-slate-500">{profile?.full_name || profile?.email}</p>
         <button
           type="button"
@@ -72,7 +131,7 @@ export function PanelLayout({ title, subtitle, items, banner, extra }: Props) {
   );
 
   return (
-    <div className="min-h-screen lg:flex">
+    <div className={`min-h-screen lg:flex ${dark ? 'panel-dark' : ''}`}>
       <aside className="hidden w-64 shrink-0 border-r border-slate-200 bg-white lg:fixed lg:inset-y-0 lg:block">{nav}</aside>
 
       <header className="sticky top-0 z-30 flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3 lg:hidden">
@@ -80,9 +139,12 @@ export function PanelLayout({ title, subtitle, items, banner, extra }: Props) {
           <CalendarCheck className="h-5 w-5 shrink-0" />
           <span className="truncate text-sm font-semibold">{title}</span>
         </div>
-        <button type="button" onClick={() => setOpen(true)} className="rounded-lg p-2 text-slate-700 hover:bg-slate-100" aria-label="Abrir menu">
-          <Menu className="h-5 w-5" />
-        </button>
+        <div className="flex items-center gap-1">
+          <ModeButton dark={dark} onToggle={toggleDark} compact />
+          <button type="button" onClick={() => setOpen(true)} className="rounded-lg p-2 text-slate-700 hover:bg-slate-100" aria-label="Abrir menu">
+            <Menu className="h-5 w-5" />
+          </button>
+        </div>
       </header>
 
       {open && (

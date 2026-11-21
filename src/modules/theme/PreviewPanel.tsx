@@ -91,7 +91,7 @@ export function PreviewPanel({ src, iframeRef, device, onDevice, mode, onMode, o
       <div ref={boxRef} className="w-full">
         <div className="mx-auto" style={{ width: size.outerWidth * scale, height: size.outerHeight * scale }}>
           <div
-            className={mobile ? 'relative rounded-[3.25rem] bg-slate-900 p-3 shadow-2xl' : 'relative overflow-hidden rounded-xl border border-slate-300 bg-white shadow-2xl'}
+            className={mobile ? 'relative rounded-[3.25rem] bg-neutral-900 p-3 shadow-2xl' : 'relative overflow-hidden rounded-xl border border-slate-300 bg-white shadow-2xl'}
             style={{ width: size.outerWidth, height: size.outerHeight, transform: `scale(${scale})`, transformOrigin: 'top left' }}
           >
             <div className={mobile ? 'hidden' : 'flex h-10 items-center gap-3 border-b border-slate-200 bg-slate-100 px-4'}>
@@ -110,7 +110,7 @@ export function PreviewPanel({ src, iframeRef, device, onDevice, mode, onMode, o
               className={mobile ? 'block overflow-hidden rounded-[2.5rem] bg-white' : 'block bg-white'}
               style={{ width: size.width, height: size.height, border: 0 }}
             />
-            <div className={mobile ? 'pointer-events-none absolute left-1/2 top-5 h-6 w-24 -translate-x-1/2 rounded-full bg-slate-900' : 'hidden'} />
+            <div className={mobile ? 'pointer-events-none absolute left-1/2 top-5 h-6 w-24 -translate-x-1/2 rounded-full bg-neutral-900' : 'hidden'} />
           </div>
         </div>
       </div>

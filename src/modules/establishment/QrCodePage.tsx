@@ -412,7 +412,7 @@ export function QrCodePage() {
         {/* prévia do cartaz */}
         <div className="lg:sticky lg:top-6 lg:self-start">
           <p className="mb-3 text-sm font-medium text-slate-700">Prévia do cartaz</p>
-          <div className="mx-auto w-full max-w-[380px] overflow-hidden rounded-3xl bg-white shadow-xl ring-1 ring-slate-200">
+          <div className="keep-light mx-auto w-full max-w-[380px] overflow-hidden rounded-3xl bg-white text-slate-900 shadow-xl ring-1 ring-slate-200">
             <div className="flex flex-col items-center px-6 py-7 text-center" style={{ backgroundColor: primary, color: onPrimary }}>
               {establishment.logo_url && (
                 <img src={establishment.logo_url} alt="" className="mb-3 h-14 w-14 rounded-xl bg-white object-contain p-1" />
