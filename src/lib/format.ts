@@ -39,6 +39,11 @@ export function parseMoney(text: string): number | null {
   return Math.round(value * 100);
 }
 
+/** Está em promoção quando o preço original é maior que o atual. */
+export function isPromotion(service: { price_cents: number; compare_price_cents?: number | null }): boolean {
+  return service.compare_price_cents != null && service.compare_price_cents > service.price_cents;
+}
+
 export function centsToInput(cents: number): string {
   return (cents / 100).toFixed(2).replace('.', ',');
 }

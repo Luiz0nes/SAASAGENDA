@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, CheckCircle2, Clock, MapPin, MessageCircle, Moon, Phone, Sun, UserRound } from 'lucide-react';
 import { SlotPicker } from '../../components/SlotPicker';
 import {
-  formatDate, formatDuration, formatMoney, formatPhone, formatTime, instagramLink, todayInZone, trimTime, weekdayOf, WEEKDAYS, whatsappLink,
+  formatDate, formatDuration, formatMoney, formatPhone, formatTime, instagramLink, isPromotion, todayInZone, trimTime, weekdayOf, WEEKDAYS, whatsappLink,
 } from '../../lib/format';
 import { errorMessage, supabase, unwrap } from '../../lib/supabase';
 import { initialMode, loadFonts, normalizeTheme, storeMode, themeVars, type ResolvedMode } from '../../lib/theme';
@@ -411,6 +411,14 @@ export function BookingView({ data, loadSlots, preview = false, forcedMode }: Bo
                         <button type="button" onClick={() => pickService(s)} className="pub-option flex items-center gap-3 p-3 sm:p-4">
                           {s.image_url && <img src={s.image_url} alt="" className="h-16 w-16 shrink-0 object-cover" style={{ borderRadius: 'var(--r-inner)' }} />}
                           <span className="min-w-0 flex-1">
+                            {isPromotion(s) && (
+                              <span
+                                className="mb-1 inline-block px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide"
+                                style={{ borderRadius: '999px', backgroundColor: 'var(--c-accent)', color: 'var(--c-on-accent)' }}
+                              >
+                                Promoção
+                              </span>
+                            )}
                             <span className="block font-semibold">{s.name}</span>
                             {s.description && <span className="pub-muted mt-0.5 block text-sm">{s.description}</span>}
                             <span className="pub-muted mt-1 inline-flex items-center gap-1 text-xs">
@@ -418,7 +426,12 @@ export function BookingView({ data, loadSlots, preview = false, forcedMode }: Bo
                               {formatDuration(s.duration_minutes)}
                             </span>
                           </span>
-                          {theme.show_prices && <span className="pub-primary-text shrink-0 text-base font-bold">{formatMoney(s.price_cents)}</span>}
+                          {theme.show_prices && (
+                            <span className="shrink-0 text-right">
+                              {isPromotion(s) && <span className="pub-muted block text-xs line-through">{formatMoney(s.compare_price_cents ?? 0)}</span>}
+                              <span className="pub-primary-text block text-base font-bold">{formatMoney(s.price_cents)}</span>
+                            </span>
+                          )}
                         </button>
                       </li>
                     ))}

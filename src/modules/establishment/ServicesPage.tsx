@@ -3,7 +3,7 @@ import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { ImageUpload } from '../../components/ImageUpload';
 import { Badge, Button, Card, ConfirmModal, EmptyState, ErrorBox, Field, Modal, PageHeader, Spinner, Toggle } from '../../components/ui';
 import { useToast } from '../../components/Toast';
-import { centsToInput, formatDuration, formatMoney, parseMoney } from '../../lib/format';
+import { centsToInput, formatDuration, formatMoney, isPromotion, parseMoney } from '../../lib/format';
 import { errorMessage, supabase, unwrap } from '../../lib/supabase';
 import { useLoad } from '../../lib/useLoad';
 import type { Professional, Service } from '../../types/database';
@@ -15,6 +15,7 @@ interface ServiceForm {
   description: string;
   imageUrl: string | null;
   price: string;
+  comparePrice: string;
   duration: string;
   buffer: string;
   isActive: boolean;
@@ -22,7 +23,7 @@ interface ServiceForm {
 }
 
 const EMPTY: ServiceForm = {
-  id: null, name: '', description: '', imageUrl: null, price: '0,00', duration: '30', buffer: '0', isActive: true, professionalIds: [],
+  id: null, name: '', description: '', imageUrl: null, price: '0,00', comparePrice: '', duration: '30', buffer: '0', isActive: true, professionalIds: [],
 };
 
 export function ServicesPage() {
@@ -56,6 +57,7 @@ export function ServicesPage() {
       description: service.description ?? '',
       imageUrl: service.image_url,
       price: centsToInput(service.price_cents),
+      comparePrice: service.compare_price_cents != null ? centsToInput(service.compare_price_cents) : '',
       duration: String(service.duration_minutes),
       buffer: String(service.buffer_minutes),
       isActive: service.is_active,
@@ -70,6 +72,9 @@ export function ServicesPage() {
     const duration = Number(form.duration);
     const buffer = Number(form.buffer);
     if (price === null) return toast.error('Informe um preço válido.');
+    const comparePrice = form.comparePrice.trim() === '' ? null : parseMoney(form.comparePrice);
+    if (comparePrice === null && form.comparePrice.trim() !== '') return toast.error('Informe um preço original válido.');
+    if (comparePrice !== null && comparePrice <= price) return toast.error('Na promoção, o preço original (“de”) precisa ser maior que o preço atual.');
     if (!Number.isInteger(duration) || duration < 5 || duration > 720) return toast.error('A duração deve ficar entre 5 e 720 minutos.');
     if (!Number.isInteger(buffer) || buffer < 0 || buffer > 240) return toast.error('O intervalo deve ficar entre 0 e 240 minutos.');
 
@@ -79,6 +84,7 @@ export function ServicesPage() {
       description: form.description.trim() || null,
       image_url: form.imageUrl,
       price_cents: price,
+      compare_price_cents: comparePrice,
       duration_minutes: duration,
       buffer_minutes: buffer,
       is_active: form.isActive,
@@ -155,9 +161,13 @@ export function ServicesPage() {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-start justify-between gap-2">
                     <p className="truncate font-semibold text-slate-900">{service.name}</p>
-                    <Badge tone={service.is_active ? 'green' : 'gray'}>{service.is_active ? 'Ativo' : 'Inativo'}</Badge>
+                    <span className="flex shrink-0 gap-1">
+                      {isPromotion(service) && <Badge tone="yellow">Promoção</Badge>}
+                      <Badge tone={service.is_active ? 'green' : 'gray'}>{service.is_active ? 'Ativo' : 'Inativo'}</Badge>
+                    </span>
                   </div>
                   <p className="text-sm text-slate-600">
+                    {isPromotion(service) && <span className="mr-1 text-slate-400 line-through">{formatMoney(service.compare_price_cents ?? 0)}</span>}
                     {formatMoney(service.price_cents)} · {formatDuration(service.duration_minutes)}
                     {service.buffer_minutes > 0 ? ` · +${service.buffer_minutes} min de intervalo` : ''}
                   </p>
@@ -188,10 +198,15 @@ export function ServicesPage() {
             <Field label="Descrição">
               <textarea className="input" rows={2} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
             </Field>
-            <div className="grid gap-4 sm:grid-cols-3">
+            <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Preço (R$)">
                 <input className="input" inputMode="decimal" required value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
               </Field>
+              <Field label="Preço original — promoção (R$)" hint="Opcional. Ex.: “De R$ 110” por R$ 85. Aparece riscado na página.">
+                <input className="input" inputMode="decimal" placeholder="Sem promoção" value={form.comparePrice} onChange={(e) => setForm({ ...form, comparePrice: e.target.value })} />
+              </Field>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Duração (min)">
                 <input className="input" inputMode="numeric" required value={form.duration} onChange={(e) => setForm({ ...form, duration: e.target.value })} />
               </Field>

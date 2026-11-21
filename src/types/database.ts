@@ -101,6 +101,8 @@ export interface Service {
   description: string | null;
   image_url: string | null;
   price_cents: number;
+  /** preço "de" (riscado) quando o serviço está em promoção */
+  compare_price_cents: number | null;
   duration_minutes: number;
   buffer_minutes: number;
   sort_order: number;
@@ -211,6 +213,7 @@ export interface PublicService {
   description: string | null;
   image_url: string | null;
   price_cents: number;
+  compare_price_cents: number | null;
   duration_minutes: number;
 }
 
