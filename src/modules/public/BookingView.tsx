@@ -201,7 +201,7 @@ export function BookingView({ data, loadSlots, preview = false, forcedMode }: Bo
   }, [theme.font_heading, theme.font_body]);
 
   // fundo do navegador acompanha o tema (sem "faixa branca" ao rolar)
-  const bg = (vars as Record<string, string>)['--c-bg'];
+  const bg = (vars as unknown as Record<string, string>)['--c-bg'];
   useEffect(() => {
     const previous = document.body.style.backgroundColor;
     document.body.style.backgroundColor = bg;

@@ -1,0 +1,11 @@
+# Cabeçalhos do Cloudflare Pages
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  # a pré-visualização da Personalização usa um iframe do próprio site
+  X-Frame-Options: SAMEORIGIN
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+
+# arquivos gerados pelo Vite têm nome com hash: podem ficar em cache por 1 ano
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
