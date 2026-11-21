@@ -1,10 +1,13 @@
 import { CalendarDays, Clock, Crown, LayoutDashboard, Palette, QrCode, Scissors, Settings, UserRound, Users } from 'lucide-react';
 import { PanelLayout, type NavItem } from '../../components/PanelLayout';
 import { ESTABLISHMENT_STATUS_LABEL, ROLE_LABEL } from '../../lib/format';
+import { useAgendaRealtime } from './agendaRealtime';
 import { EstablishmentProvider, useEstablishment } from './EstablishmentContext';
 
 function Layout() {
   const { establishment, membership, memberships, can, select } = useEstablishment();
+  // avisos de novos agendamentos em qualquer tela do painel
+  useAgendaRealtime(establishment.id, establishment.timezone);
   const icon = 'h-4 w-4';
 
   // Cada item só aparece para quem tem a permissão correspondente.

@@ -4,6 +4,8 @@ import { errorMessage } from './supabase';
 /**
  * Carrega dados assíncronos e expõe loading/erro/reload.
  * `deps` controla quando recarregar (como no useEffect).
+ * `reload(true)` atualiza em silêncio: mantém os dados na tela enquanto busca
+ * (usado nas atualizações automáticas, para a lista não "piscar").
  */
 export function useLoad<T>(loader: () => Promise<T>, deps: unknown[]) {
   const [data, setData] = useState<T | null>(null);
@@ -13,15 +15,18 @@ export function useLoad<T>(loader: () => Promise<T>, deps: unknown[]) {
   loaderRef.current = loader;
   const requestRef = useRef(0);
 
-  const reload = useCallback(async () => {
+  const reload = useCallback(async (silent = false) => {
     const request = ++requestRef.current;
-    setLoading(true);
-    setError(null);
+    if (!silent) {
+      setLoading(true);
+      setError(null);
+    }
     try {
       const result = await loaderRef.current();
       if (request === requestRef.current) setData(result);
     } catch (err) {
-      if (request === requestRef.current) setError(errorMessage(err));
+      // numa atualização silenciosa, um erro passageiro não apaga a tela
+      if (request === requestRef.current && !silent) setError(errorMessage(err));
     } finally {
       if (request === requestRef.current) setLoading(false);
     }

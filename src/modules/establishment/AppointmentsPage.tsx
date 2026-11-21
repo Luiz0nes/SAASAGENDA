@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { MessageCircle, Plus, StickyNote } from 'lucide-react';
 import { Badge, Button, Card, ConfirmModal, EmptyState, ErrorBox, PageHeader, Spinner } from '../../components/ui';
 import { useToast } from '../../components/Toast';
@@ -7,6 +7,7 @@ import { errorMessage, supabase, unwrap } from '../../lib/supabase';
 import { useLoad } from '../../lib/useLoad';
 import type { AppointmentStatus, AppointmentWithRelations, Professional, Service } from '../../types/database';
 import { NewAppointmentModal, NotesModal, RescheduleModal, type AgendaCatalog } from './AppointmentModals';
+import { useAgendaRefresh, type AgendaChangedDetail } from './agendaRealtime';
 import { DayStrip, type DayCount } from './DayStrip';
 import { useEstablishment } from './EstablishmentContext';
 
@@ -96,9 +97,29 @@ export function AppointmentsPage() {
   }
 
   function refreshAll() {
-    void list.reload();
-    void counts.reload();
+    void list.reload(true);
+    void counts.reload(true);
   }
+
+  // agendamentos que acabaram de chegar ficam destacados por alguns segundos
+  const [fresh, setFresh] = useState<string[]>([]);
+  const reloadList = list.reload;
+  const reloadCounts = counts.reload;
+  const onAgendaChanged = useCallback(
+    (detail: AgendaChangedDetail) => {
+      void reloadList(true);
+      void reloadCounts(true);
+      const id = detail.newAppointmentId;
+      if (id) setFresh((current) => [...current, id]);
+    },
+    [reloadList, reloadCounts],
+  );
+  useAgendaRefresh(onAgendaChanged);
+  useEffect(() => {
+    if (fresh.length === 0) return;
+    const timer = window.setTimeout(() => setFresh([]), 10_000);
+    return () => window.clearTimeout(timer);
+  }, [fresh]);
 
   function ask(appointment: AppointmentWithRelations, status: AppointmentStatus) {
     const who = appointment.customer?.name ?? 'cliente';
@@ -206,7 +227,7 @@ export function AppointmentsPage() {
           {list.data.map((a) => {
             const open = a.status === 'pending' || a.status === 'confirmed';
             return (
-              <Card key={a.id} className="p-4">
+              <Card key={a.id} className={`p-4 transition-shadow ${fresh.includes(a.id) ? 'ring-2 ring-emerald-400 ring-offset-2' : ''}`}>
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div className="flex gap-4">
                     <div className="w-14 shrink-0 text-center">
@@ -233,6 +254,7 @@ export function AppointmentsPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
+                    {fresh.includes(a.id) && <Badge tone="green">Novo</Badge>}
                     {a.source === 'public' && <Badge>Online</Badge>}
                     <Badge tone={STATUS_TONE[a.status]}>{STATUS_LABEL[a.status]}</Badge>
                   </div>

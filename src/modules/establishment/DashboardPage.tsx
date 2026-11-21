@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CalendarCheck, CalendarClock, CalendarDays, CheckCircle2, CircleDollarSign, Copy, UserRound, Users, XCircle } from 'lucide-react';
 import { Button, Card, ErrorBox, PageHeader, Spinner, StatCard } from '../../components/ui';
@@ -7,6 +7,7 @@ import { addDays, formatMoney, todayInZone } from '../../lib/format';
 import { supabase, unwrap } from '../../lib/supabase';
 import { useLoad } from '../../lib/useLoad';
 import type { DashboardData } from '../../types/database';
+import { useAgendaRefresh } from './agendaRealtime';
 import { useEstablishment } from './EstablishmentContext';
 
 const PERIODS = [
@@ -32,6 +33,9 @@ export function DashboardPage() {
       ),
     [establishment.id, period, today],
   );
+
+  // indicadores acompanham novos agendamentos sem recarregar a página
+  useAgendaRefresh(useCallback(() => void reload(true), [reload]));
 
   const publicUrl = `${window.location.origin}/agendar/${establishment.slug}`;
 
