@@ -7,12 +7,14 @@ import { DashboardPage } from './modules/establishment/DashboardPage';
 import { EstablishmentLayout } from './modules/establishment/EstablishmentLayout';
 import { HoursPage } from './modules/establishment/HoursPage';
 import { ProfessionalsPage } from './modules/establishment/ProfessionalsPage';
+import { QrCodePage } from './modules/establishment/QrCodePage';
 import { ServicesPage } from './modules/establishment/ServicesPage';
 import { SettingsPage } from './modules/establishment/SettingsPage';
 import { ThemePage } from './modules/establishment/ThemePage';
 import { AppointmentPage, MyAppointmentsPage } from './modules/public/AppointmentPage';
 import { BookingPage } from './modules/public/BookingPage';
 import { LandingPage } from './modules/public/LandingPage';
+import { PreviewPage } from './modules/public/PreviewPage';
 import { EstablishmentsPage } from './modules/superadmin/EstablishmentsPage';
 import { PlansPage } from './modules/superadmin/PlansPage';
 import { SuperAdminDashboard } from './modules/superadmin/SuperAdminDashboard';
@@ -29,6 +31,14 @@ export default function App() {
       <Route path="/agendar/:slug" element={<BookingPage />} />
       <Route path="/agendamento/:token" element={<AppointmentPage />} />
       <Route path="/meus-agendamentos" element={<MyAppointmentsPage />} />
+      <Route
+        path="/preview/:establishmentId"
+        element={
+          <RequireAuth>
+            <PreviewPage />
+          </RequireAuth>
+        }
+      />
       <Route
         path="/sem-acesso"
         element={
@@ -68,6 +78,7 @@ export default function App() {
         <Route path="profissionais" element={<ProfessionalsPage />} />
         <Route path="horarios" element={<HoursPage />} />
         <Route path="personalizacao" element={<ThemePage />} />
+        <Route path="qrcode" element={<QrCodePage />} />
         <Route path="configuracoes" element={<SettingsPage />} />
       </Route>
 

@@ -16,3 +16,155 @@
     @apply block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10 disabled:bg-slate-100 disabled:text-slate-500;
   }
 }
+
+/* ---------------------------------------------------------------------
+   Página pública: tudo vem das variáveis CSS do tema (src/lib/theme.ts)
+   --------------------------------------------------------------------- */
+@layer components {
+  .pub {
+    background-color: var(--c-bg);
+    color: var(--c-text);
+    font-family: var(--font-body);
+    transition: background-color 0.25s ease, color 0.25s ease;
+  }
+  .pub-heading {
+    font-family: var(--font-heading);
+    font-weight: var(--heading-weight);
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+  }
+  .pub-card {
+    background-color: var(--c-surface);
+    border: 1px solid var(--card-border);
+    border-radius: var(--r-card);
+    box-shadow: var(--card-shadow);
+  }
+  .pub-muted {
+    color: var(--c-muted);
+  }
+  .pub-primary-text {
+    color: var(--c-primary-text);
+  }
+  .pub-soft {
+    background-color: var(--c-soft);
+  }
+  .pub-line {
+    border-color: var(--c-border);
+  }
+  .pub-option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background-color: var(--c-surface);
+    color: var(--c-text);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-inner);
+    transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  .pub-option:hover {
+    border-color: var(--c-primary);
+  }
+  .pub-option:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--c-ring);
+  }
+  .pub-option[data-selected='true'] {
+    background-color: var(--c-primary);
+    border-color: var(--c-primary);
+    color: var(--c-on-primary);
+  }
+  .pub-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.25rem;
+    font-size: 0.925rem;
+    font-weight: 600;
+    border-radius: var(--r-btn);
+    background-color: var(--btn-bg);
+    color: var(--btn-fg);
+    border: 1.5px solid var(--btn-border);
+    transition: filter 0.15s ease, opacity 0.15s ease;
+  }
+  .pub-btn:hover:not(:disabled) {
+    filter: brightness(1.07);
+  }
+  .pub-btn:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--c-ring);
+  }
+  .pub-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+  .pub-btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: var(--r-btn);
+    color: var(--c-muted);
+  }
+  .pub-btn-ghost:hover {
+    background-color: var(--c-soft);
+    color: var(--c-text);
+  }
+  .pub-input {
+    display: block;
+    width: 100%;
+    padding: 0.7rem 0.9rem;
+    font-size: 0.925rem;
+    background-color: var(--c-surface);
+    color: var(--c-text);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-input);
+    outline: none;
+  }
+  .pub-input::placeholder {
+    color: var(--c-muted);
+  }
+  .pub-input:focus {
+    border-color: var(--c-primary);
+    box-shadow: 0 0 0 3px var(--c-ring);
+  }
+  .pub-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+    border-radius: 999px;
+    border: 1px solid var(--c-border);
+    background-color: var(--c-surface);
+    color: var(--c-text);
+  }
+  .pub-mode-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.85rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border-radius: 999px;
+    border: 1px solid var(--c-border);
+    background-color: color-mix(in srgb, var(--c-surface) 88%, transparent);
+    color: var(--c-text);
+    box-shadow: 0 6px 20px -8px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  .pub-mode-toggle:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--c-ring);
+  }
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}

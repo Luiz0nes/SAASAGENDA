@@ -4,7 +4,11 @@ export type EstablishmentStatus = 'active' | 'suspended' | 'inactive';
 export type MemberRole = 'owner' | 'admin' | 'receptionist' | 'professional';
 export type AppointmentStatus = 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'no_show';
 export type SubscriptionStatus = 'trial' | 'active' | 'past_due' | 'cancelled';
-export type ThemeLayout = 'classic' | 'modern' | 'compact';
+export type ThemeLayout = 'classic' | 'modern' | 'compact' | 'centered';
+export type ThemeRadius = 'square' | 'soft' | 'rounded' | 'pill';
+export type ButtonStyle = 'solid' | 'outline' | 'soft';
+export type CardStyle = 'border' | 'shadow' | 'flat';
+export type ColorMode = 'light' | 'dark' | 'system';
 
 export type Permission =
   | 'manage_appointments'
@@ -163,13 +167,28 @@ export interface BlockedTime {
 }
 
 export interface Theme {
+  /** id do tema pronto que originou o visual (apenas informativo) */
+  preset: string | null;
   primary_color: string;
   secondary_color: string;
   background_color: string;
+  surface_color: string;
   text_color: string;
+  dark_background_color: string;
+  dark_surface_color: string;
+  dark_text_color: string;
+  font_heading: string;
+  font_body: string;
+  radius: ThemeRadius;
+  button_style: ButtonStyle;
+  card_style: CardStyle;
   layout: ThemeLayout;
+  /** mostra o botão para o cliente alternar entre claro e escuro */
+  dark_mode_toggle: boolean;
+  default_mode: ColorMode;
   headline: string | null;
   about_text: string | null;
+  gallery: string[];
   show_prices: boolean;
   show_professionals: boolean;
 }

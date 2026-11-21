@@ -20,11 +20,11 @@ Na raiz do repositório:
 ```bash
 npx supabase login
 npx supabase link --project-ref SEU_REFERENCE_ID
-npx supabase db push            # aplica os 5 arquivos de supabase/migrations em ordem
+npx supabase db push            # aplica os arquivos de supabase/migrations em ordem
 npx supabase functions deploy   # publica as 3 Edge Functions
 ```
 
-**Alternativa sem CLI para o banco:** abra o **SQL Editor** e execute o conteúdo de cada arquivo de `supabase/migrations/`, um por vez, na ordem numérica (01 → 05). As Edge Functions ainda precisam ser publicadas pela CLI.
+**Alternativa sem CLI para o banco:** abra o **SQL Editor** e execute o conteúdo de cada arquivo de `supabase/migrations/`, um por vez, na ordem numérica (01 → 06). As Edge Functions ainda precisam ser publicadas pela CLI.
 
 ## 3. Configurar a autenticação
 

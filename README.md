@@ -39,22 +39,25 @@ supabase/
     …03_rls.sql                  políticas de Row Level Security
     …04_api.sql                  funções RPC (página pública, painéis, provisionamento)
     …05_storage.sql              bucket de imagens e suas políticas
+    …06_theme_customization.sql  temas, fontes, estilo, galeria e modo escuro
   functions/
     admin-create-establishment/  SuperAdmin cria estabelecimento + proprietário
     create-staff-user/           proprietário cria contas da equipe
     admin-manage-user/           redefinir senha / bloquear acesso
     _shared/                     CORS, autenticação do chamador, validações
 src/
-  lib/           cliente Supabase, formatação, datas com fuso, useLoad
+  lib/           cliente Supabase, formatação, datas com fuso, useLoad,
+                 theme.ts (motor de temas e modo escuro), qrcode.ts (gerador de QR)
   types/         tipos das tabelas e das respostas RPC
   components/    UI reutilizável (botões, modal, toast, SlotPicker, layout dos painéis)
   modules/
     auth/           sessão, guards de rota, login, recuperação e definição de senha
     superadmin/     visão geral, estabelecimentos, planos
     establishment/  início, agenda, clientes, serviços, profissionais, horários,
-                    personalização, configurações
-    public/         página inicial, página pública do estabelecimento, fluxo de
-                    agendamento, consulta/cancelamento/reagendamento
+                    personalização, QR Code, configurações
+    public/         página inicial, página pública do estabelecimento (BookingView),
+                    pré-visualização (/preview/:id), consulta/cancelamento/reagendamento
+    theme/          temas prontos, editor de personalização e moldura da prévia
 docs/
   SUPABASE_SETUP.md   passo a passo de instalação
   RLS.md              políticas de segurança, tabela por tabela
@@ -75,8 +78,11 @@ O navegador nunca calcula disponibilidade nem grava horários diretamente pela p
 - Edge Functions de criação de proprietários e equipe (a Service Role Key fica só no servidor).
 - Autenticação: login, recuperação de senha, definição de senha por convite.
 - **SuperAdmin:** visão geral, estabelecimentos (criar, editar, suspender, atribuir plano), planos (CRUD).
-- **Estabelecimento:** início com indicadores, agenda diária com filtros (confirmar, concluir, falta, cancelar, reagendar, trocar profissional, observações, novo agendamento), clientes, serviços, profissionais com agenda semanal, funcionamento e bloqueios, personalização visual, configurações e regras.
-- **Público:** página do estabelecimento com tema próprio, fluxo de agendamento, consulta, cancelamento e reagendamento, links de WhatsApp.
+- **Estabelecimento:** início com indicadores, agenda diária com filtros (confirmar, concluir, falta, cancelar, reagendar, trocar profissional, observações, novo agendamento), clientes, serviços, profissionais com agenda semanal, funcionamento e bloqueios, configurações e regras.
+- **Personalização:** 14 temas prontos por segmento (barbearia, salão, clínica, odontologia, estética, autônomo), cores do modo claro e do escuro, 18 fontes, 4 layouts de cabeçalho, cantos, botões, cartões, galeria de até 12 fotos e textos, com pré-visualização ao vivo no celular e no computador.
+- **Modo escuro:** botão para o cliente alternar na página pública (pode ser desligado), modo inicial claro/escuro/automático e paleta escura própria.
+- **QR Code:** QR do link de agendamento (gerador próprio, sem dependência), com cor e logotipo no centro, download em PNG e SVG e cartaz A4 pronto para imprimir.
+- **Público:** página do estabelecimento com o tema dele, fluxo de agendamento em etapas, galeria, equipe, consulta, cancelamento e reagendamento, links de WhatsApp.
 
 ## Próximas etapas (backend já preparado)
 

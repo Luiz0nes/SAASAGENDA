@@ -1,8 +1,7 @@
 // Acesso da página pública: somente funções RPC, nunca tabelas.
-import type { CSSProperties } from 'react';
-import { contrastColor, formatDate, formatTime } from '../../lib/format';
+import { formatDate, formatTime } from '../../lib/format';
 import { supabase, unwrap } from '../../lib/supabase';
-import type { PublicAppointment, PublicEstablishmentData, Slot, Theme } from '../../types/database';
+import type { PublicAppointment, PublicEstablishmentData, Slot } from '../../types/database';
 
 export async function fetchPublicEstablishment(slug: string): Promise<PublicEstablishmentData | null> {
   return unwrap<PublicEstablishmentData | null>(await supabase.rpc('get_public_establishment', { p_slug: slug }));
@@ -12,6 +11,17 @@ export async function fetchPublicSlots(slug: string, serviceId: string, date: st
   return unwrap<Slot[]>(
     await supabase.rpc('get_available_slots', {
       p_slug: slug,
+      p_service_id: serviceId,
+      p_date: date,
+      p_professional_id: professionalId,
+    }),
+  );
+}
+
+export async function fetchAdminSlots(establishmentId: string, serviceId: string, date: string, professionalId: string | null): Promise<Slot[]> {
+  return unwrap<Slot[]>(
+    await supabase.rpc('get_available_slots_admin', {
+      p_establishment_id: establishmentId,
       p_service_id: serviceId,
       p_date: date,
       p_professional_id: professionalId,
@@ -43,35 +53,6 @@ export function saveToken(token: string): void {
     // sem armazenamento local: o cliente ainda pode usar o link do agendamento
   }
 }
-
-export const DEFAULT_THEME: Theme = {
-  primary_color: '#0f172a',
-  secondary_color: '#2563eb',
-  background_color: '#f8fafc',
-  text_color: '#0f172a',
-  layout: 'classic',
-  headline: null,
-  about_text: null,
-  show_prices: true,
-  show_professionals: true,
-};
-
-/** Variáveis CSS do tema: cada estabelecimento pinta a própria página. */
-export function themeStyle(theme: Theme): CSSProperties {
-  return {
-    '--c-primary': theme.primary_color,
-    '--c-on-primary': contrastColor(theme.primary_color),
-    '--c-secondary': theme.secondary_color,
-    '--c-on-secondary': contrastColor(theme.secondary_color),
-    '--c-bg': theme.background_color,
-    '--c-text': theme.text_color,
-  } as CSSProperties;
-}
-
-export const PRIMARY_BUTTON =
-  'inline-flex items-center justify-center gap-2 rounded-lg bg-[var(--c-primary)] px-4 py-2.5 text-sm font-semibold text-[var(--c-on-primary)] transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60';
-
-export const ACCENT_SELECTED = 'border-[var(--c-primary)] bg-[var(--c-primary)] text-[var(--c-on-primary)]';
 
 export function manageUrl(token: string): string {
   return `${window.location.origin}/agendamento/${token}`;

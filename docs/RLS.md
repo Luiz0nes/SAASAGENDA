@@ -67,6 +67,10 @@ O visitante não consulta tabelas. Estas funções (`SECURITY DEFINER`) devolvem
 
 **Clientes só acessam os próprios agendamentos:** não existe listagem por telefone ou nome. Cada agendamento tem um código aleatório (`public_token`) entregue a quem agendou; sem ele, nada é devolvido.
 
+## Pré-visualização da Personalização
+
+A rota `/preview/:establishmentId` (aberta em um iframe no painel) monta a página pública a partir das tabelas com a sessão do usuário logado, portanto vale a RLS normal: só funciona para membros do estabelecimento. As alterações ainda não salvas chegam por `postMessage`, aceito apenas da mesma origem. Nada é gravado pela prévia (o botão de confirmar fica desativado).
+
 ## Regras garantidas por trigger (valem para qualquer caminho de escrita)
 
 - Agendamento só entra se o estabelecimento estiver **ativo** e o horário passar em `appointment_conflict_reason` (funcionamento, expediente, intervalo, bloqueios, ocupação).

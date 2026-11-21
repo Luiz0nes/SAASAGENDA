@@ -1,4 +1,4 @@
-import { CalendarDays, Clock, LayoutDashboard, Palette, Scissors, Settings, UserRound, Users } from 'lucide-react';
+import { CalendarDays, Clock, LayoutDashboard, Palette, QrCode, Scissors, Settings, UserRound, Users } from 'lucide-react';
 import { PanelLayout, type NavItem } from '../../components/PanelLayout';
 import { ESTABLISHMENT_STATUS_LABEL, ROLE_LABEL } from '../../lib/format';
 import { EstablishmentProvider, useEstablishment } from './EstablishmentContext';
@@ -17,6 +17,7 @@ function Layout() {
   if (can('manage_professionals')) items.push({ to: '/painel/profissionais', label: 'Profissionais', icon: <UserRound className={icon} /> });
   if (can('manage_schedules')) items.push({ to: '/painel/horarios', label: 'Horários e bloqueios', icon: <Clock className={icon} /> });
   if (can('manage_theme')) items.push({ to: '/painel/personalizacao', label: 'Personalização', icon: <Palette className={icon} /> });
+  items.push({ to: '/painel/qrcode', label: 'QR Code', icon: <QrCode className={icon} /> });
   if (can('manage_settings')) items.push({ to: '/painel/configuracoes', label: 'Configurações', icon: <Settings className={icon} /> });
 
   return (
