@@ -52,6 +52,7 @@ function themeRow(t: Theme) {
     button_style: t.button_style,
     card_style: t.card_style,
     layout: t.layout,
+    hero_animation: t.hero_animation,
     dark_mode_toggle: t.dark_mode_toggle,
     default_mode: t.default_mode,
     headline: t.headline?.trim() || null,

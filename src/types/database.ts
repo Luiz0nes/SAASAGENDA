@@ -9,6 +9,7 @@ export type ThemeRadius = 'square' | 'soft' | 'rounded' | 'pill';
 export type ButtonStyle = 'solid' | 'outline' | 'soft';
 export type CardStyle = 'border' | 'shadow' | 'flat';
 export type ColorMode = 'light' | 'dark' | 'system';
+export type HeroAnimation = 'none' | 'soft' | 'dynamic';
 
 export type Permission =
   | 'manage_appointments'
@@ -183,6 +184,8 @@ export interface Theme {
   button_style: ButtonStyle;
   card_style: CardStyle;
   layout: ThemeLayout;
+  /** animação do topo da página pública */
+  hero_animation: HeroAnimation;
   /** mostra o botão para o cliente alternar entre claro e escuro */
   dark_mode_toggle: boolean;
   default_mode: ColorMode;

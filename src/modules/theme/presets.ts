@@ -1,6 +1,6 @@
 // Temas prontos por segmento. Um clique aplica cores (claro e escuro),
 // fontes, cantos, botões, cartões e o layout do cabeçalho.
-import type { ColorMode, Theme } from '../../types/database';
+import type { ColorMode, HeroAnimation, Theme } from '../../types/database';
 
 export type Segment = 'barbearia' | 'salao' | 'clinica' | 'odonto' | 'estetica' | 'autonomo';
 
@@ -9,7 +9,7 @@ export type ThemeDesign = Pick<
   | 'primary_color' | 'secondary_color' | 'background_color' | 'surface_color' | 'text_color'
   | 'dark_background_color' | 'dark_surface_color' | 'dark_text_color'
   | 'font_heading' | 'font_body' | 'radius' | 'button_style' | 'card_style' | 'layout'
-> & { default_mode?: ColorMode };
+> & { default_mode?: ColorMode; hero_animation?: HeroAnimation };
 
 export interface ThemePreset {
   id: string;
@@ -49,7 +49,7 @@ export const PRESETS: ThemePreset[] = [
     design: {
       primary_color: '#1c1917', secondary_color: '#c8a24a', background_color: '#f5f1ea', surface_color: '#ffffff', text_color: '#1c1917',
       dark_background_color: '#0f0d0b', dark_surface_color: '#1c1917', dark_text_color: '#f5f1ea',
-      font_heading: 'Oswald', font_body: 'Inter', radius: 'square', button_style: 'solid', card_style: 'border', layout: 'modern',
+      font_heading: 'Oswald', font_body: 'Inter', radius: 'square', button_style: 'solid', card_style: 'border', layout: 'modern', hero_animation: 'dynamic',
     },
   },
   {
@@ -60,7 +60,7 @@ export const PRESETS: ThemePreset[] = [
     design: {
       primary_color: '#dc2626', secondary_color: '#f59e0b', background_color: '#f4f4f5', surface_color: '#ffffff', text_color: '#18181b',
       dark_background_color: '#0c0c0e', dark_surface_color: '#18181b', dark_text_color: '#fafafa',
-      font_heading: 'Bebas Neue', font_body: 'Inter', radius: 'soft', button_style: 'solid', card_style: 'shadow', layout: 'modern',
+      font_heading: 'Bebas Neue', font_body: 'Inter', radius: 'soft', button_style: 'solid', card_style: 'shadow', layout: 'modern', hero_animation: 'dynamic',
       default_mode: 'dark',
     },
   },
@@ -72,7 +72,7 @@ export const PRESETS: ThemePreset[] = [
     design: {
       primary_color: '#7c4a2d', secondary_color: '#2f5d50', background_color: '#f3ead8', surface_color: '#fbf6ec', text_color: '#3b2a1e',
       dark_background_color: '#1a130d', dark_surface_color: '#261c14', dark_text_color: '#f3ead8',
-      font_heading: 'Playfair Display', font_body: 'Lora', radius: 'soft', button_style: 'solid', card_style: 'border', layout: 'classic',
+      font_heading: 'Playfair Display', font_body: 'Lora', radius: 'soft', button_style: 'solid', card_style: 'border', layout: 'classic', hero_animation: 'dynamic',
     },
   },
   {
@@ -182,7 +182,7 @@ export const PRESETS: ThemePreset[] = [
     design: {
       primary_color: '#ea580c', secondary_color: '#facc15', background_color: '#fff7ed', surface_color: '#ffffff', text_color: '#431407',
       dark_background_color: '#1a0d05', dark_surface_color: '#2a160a', dark_text_color: '#ffedd5',
-      font_heading: 'Poppins', font_body: 'Poppins', radius: 'pill', button_style: 'solid', card_style: 'shadow', layout: 'modern',
+      font_heading: 'Poppins', font_body: 'Poppins', radius: 'pill', button_style: 'solid', card_style: 'shadow', layout: 'modern', hero_animation: 'dynamic',
     },
   },
 ];
@@ -208,8 +208,8 @@ export const QUICK_COLORS = [
 ];
 
 export function applyPreset(theme: Theme, preset: ThemePreset): Theme {
-  const { default_mode, ...design } = preset.design;
-  return { ...theme, ...design, default_mode: default_mode ?? 'light', preset: preset.id };
+  const { default_mode, hero_animation, ...design } = preset.design;
+  return { ...theme, ...design, default_mode: default_mode ?? 'light', hero_animation: hero_animation ?? 'soft', preset: preset.id };
 }
 
 /** Converte o segmento livre do estabelecimento em um filtro de temas. */

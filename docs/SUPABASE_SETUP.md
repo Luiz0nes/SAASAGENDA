@@ -24,7 +24,7 @@ npx supabase db push            # aplica os arquivos de supabase/migrations em o
 npx supabase functions deploy   # publica as 3 Edge Functions
 ```
 
-**Alternativa sem CLI para o banco:** abra o **SQL Editor** e execute o conteúdo de cada arquivo de `supabase/migrations/`, um por vez, na ordem numérica (01 → 06). As Edge Functions ainda precisam ser publicadas pela CLI.
+**Alternativa sem CLI para o banco:** abra o **SQL Editor** e execute o conteúdo de cada arquivo de `supabase/migrations/`, um por vez, na ordem numérica (01 → 07). As Edge Functions ainda precisam ser publicadas pela CLI.
 
 ## 3. Configurar a autenticação
 

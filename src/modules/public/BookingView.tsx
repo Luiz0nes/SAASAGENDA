@@ -1,6 +1,6 @@
 // Página pública do estabelecimento, pintada pelo tema dele.
 // Usada na página real (/agendar/:slug) e na pré-visualização do painel.
-import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, CheckCircle2, Clock, MapPin, MessageCircle, Moon, Phone, Sun, UserRound } from 'lucide-react';
 import { SlotPicker } from '../../components/SlotPicker';
@@ -51,24 +51,74 @@ function Logo({ data, size }: { data: PublicEstablishmentData; size: 'md' | 'lg'
 }
 
 // ---------------------------------------------------------------------
-// Cabeçalhos
+// Cabeçalhos (hero). As classes hero-* só animam quando o tema pede
+// (atributo data-hero em .pub — ver src/index.css).
 // ---------------------------------------------------------------------
+
+/** Capa com zoom lento; no modo dinâmico também se move com a rolagem. */
+function Cover({ src, parallax }: { src: string; parallax: boolean }) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || !parallax || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+    let frame = 0;
+    const onScroll = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const y = Math.min(window.scrollY, 900);
+        el.style.transform = `translate3d(0, ${y * 0.35}px, 0)`;
+      });
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener('scroll', onScroll);
+      el.style.transform = '';
+    };
+  }, [parallax]);
+
+  return (
+    <div ref={ref} className="hero-parallax absolute inset-0">
+      <img src={src} alt="" className="hero-cover h-full w-full object-cover" />
+    </div>
+  );
+}
+
+/** Fundo da faixa do topo: capa ou degradê (que "respira" quando animado). */
+function Band({ cover, parallax, className, children }: { cover: string | null; parallax: boolean; className: string; children?: ReactNode }) {
+  return (
+    <div className={`relative overflow-hidden ${cover ? '' : 'hero-gradient'} ${className}`} style={{ backgroundColor: 'var(--c-primary)', backgroundImage: 'var(--header-bg)' }}>
+      {cover && <Cover src={cover} parallax={parallax} />}
+      {children}
+      <div className="hero-shine" aria-hidden />
+      <div className="hero-stripes absolute inset-x-0 bottom-0" aria-hidden />
+    </div>
+  );
+}
+
 function Header({ data, theme }: { data: PublicEstablishmentData; theme: Theme }) {
   const est = data.establishment;
   const cover = est.cover_url;
+  const parallax = theme.hero_animation === 'dynamic';
 
   if (theme.layout === 'modern') {
     return (
-      <header className="relative overflow-hidden" style={{ background: 'var(--header-bg)', color: cover ? '#ffffff' : 'var(--c-on-primary)' }}>
-        {cover && <img src={cover} alt="" className="absolute inset-0 h-full w-full object-cover" />}
-        {cover && <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-black/15" />}
-        <div className="relative mx-auto max-w-5xl px-5 pb-10 pt-20 sm:pb-14 sm:pt-28">
-          <div className="flex items-center gap-4 sm:gap-6">
-            <Logo data={data} size="md" />
-            <h1 className="pub-heading text-4xl sm:text-6xl">{est.name}</h1>
+      <header style={{ color: cover ? '#ffffff' : 'var(--c-on-primary)' }}>
+        <Band cover={cover} parallax={parallax} className="">
+          {cover && <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-black/15" />}
+          <div className="relative mx-auto max-w-5xl px-5 pb-12 pt-20 sm:pb-16 sm:pt-28">
+            <div className="flex items-center gap-4 sm:gap-6">
+              <div className="hero-logo">
+                <Logo data={data} size="md" />
+              </div>
+              <h1 className="hero-title pub-heading text-4xl sm:text-6xl">{est.name}</h1>
+            </div>
+            <div className="hero-line mt-5 h-1 w-16 rounded-full" style={{ backgroundColor: 'var(--c-accent)' }} />
+            {theme.headline && <p className="hero-in hero-d2 mt-4 max-w-2xl text-base opacity-90 sm:text-lg">{theme.headline}</p>}
           </div>
-          {theme.headline && <p className="mt-5 max-w-2xl text-base opacity-90 sm:text-lg">{theme.headline}</p>}
-        </div>
+        </Band>
       </header>
     );
   }
@@ -76,16 +126,14 @@ function Header({ data, theme }: { data: PublicEstablishmentData; theme: Theme }
   if (theme.layout === 'centered') {
     return (
       <header className="text-center">
-        <div className="relative h-36 overflow-hidden sm:h-52" style={{ background: 'var(--header-bg)' }}>
-          {cover && <img src={cover} alt="" className="h-full w-full object-cover" />}
-        </div>
+        <Band cover={cover} parallax={parallax} className="h-36 sm:h-52" />
         <div className="relative z-10 mx-auto -mt-12 flex max-w-2xl flex-col items-center px-5">
-          <div className="rounded-[calc(var(--r-card)+6px)] p-1.5" style={{ backgroundColor: 'var(--c-bg)' }}>
+          <div className="hero-logo rounded-[calc(var(--r-card)+6px)] p-1.5" style={{ backgroundColor: 'var(--c-bg)' }}>
             <Logo data={data} size="lg" />
           </div>
-          <h1 className="pub-heading mt-4 text-3xl sm:text-5xl">{est.name}</h1>
-          {theme.headline && <p className="pub-muted mt-3 max-w-xl text-base">{theme.headline}</p>}
-          <div className="mt-4 h-1 w-12 rounded-full" style={{ backgroundColor: 'var(--c-accent)' }} />
+          <h1 className="hero-title pub-heading mt-4 text-3xl sm:text-5xl">{est.name}</h1>
+          {theme.headline && <p className="hero-in hero-d2 pub-muted mt-3 max-w-xl text-base">{theme.headline}</p>}
+          <div className="hero-line hero-line-center mt-4 h-1 w-12 rounded-full" style={{ backgroundColor: 'var(--c-accent)' }} />
         </div>
       </header>
     );
@@ -95,12 +143,15 @@ function Header({ data, theme }: { data: PublicEstablishmentData; theme: Theme }
     return (
       <header className="mx-auto max-w-5xl px-5 pt-16 sm:pt-14">
         <div className="flex items-center gap-4">
-          <Logo data={data} size="md" />
+          <div className="hero-logo">
+            <Logo data={data} size="md" />
+          </div>
           <div className="min-w-0">
-            <h1 className="pub-heading text-2xl sm:text-4xl">{est.name}</h1>
-            {theme.headline && <p className="pub-muted mt-1 text-sm sm:text-base">{theme.headline}</p>}
+            <h1 className="hero-title pub-heading text-2xl sm:text-4xl">{est.name}</h1>
+            {theme.headline && <p className="hero-in hero-d2 pub-muted mt-1 text-sm sm:text-base">{theme.headline}</p>}
           </div>
         </div>
+        <div className="hero-line mt-5 h-1 w-16 rounded-full" style={{ backgroundColor: 'var(--c-accent)' }} />
       </header>
     );
   }
@@ -108,17 +159,15 @@ function Header({ data, theme }: { data: PublicEstablishmentData; theme: Theme }
   // classic
   return (
     <header>
-      <div className="relative h-40 overflow-hidden sm:h-60" style={{ background: 'var(--header-bg)' }}>
-        {cover && <img src={cover} alt="" className="h-full w-full object-cover" />}
-      </div>
+      <Band cover={cover} parallax={parallax} className="h-40 sm:h-60" />
       <div className="mx-auto max-w-5xl px-5">
         <div className="relative z-10 -mt-12 flex items-end gap-4">
-          <div className="rounded-[calc(var(--r-card)+6px)] p-1.5" style={{ backgroundColor: 'var(--c-bg)' }}>
+          <div className="hero-logo rounded-[calc(var(--r-card)+6px)] p-1.5" style={{ backgroundColor: 'var(--c-bg)' }}>
             <Logo data={data} size="lg" />
           </div>
         </div>
-        <h1 className="pub-heading mt-3 text-3xl sm:text-5xl">{est.name}</h1>
-        {theme.headline && <p className="pub-muted mt-2 max-w-2xl text-base">{theme.headline}</p>}
+        <h1 className="hero-title pub-heading mt-3 text-3xl sm:text-5xl">{est.name}</h1>
+        {theme.headline && <p className="hero-in hero-d2 pub-muted mt-2 max-w-2xl text-base">{theme.headline}</p>}
       </div>
     </header>
   );
@@ -267,7 +316,7 @@ export function BookingView({ data, loadSlots, preview = false, forcedMode }: Bo
   const showToggle = theme.dark_mode_toggle;
 
   return (
-    <div style={vars} className="pub min-h-screen pb-16" data-mode={mode}>
+    <div style={vars} className="pub min-h-screen overflow-x-clip pb-16" data-mode={mode} data-hero={theme.hero_animation}>
       {showToggle && (
         <button
           type="button"
@@ -281,10 +330,11 @@ export function BookingView({ data, loadSlots, preview = false, forcedMode }: Bo
         </button>
       )}
 
-      <Header data={data} theme={theme} />
+      {/* a chave faz a animação de entrada tocar de novo quando o estilo muda */}
+      <Header key={`${theme.hero_animation}-${theme.layout}`} data={data} theme={theme} />
 
       <div className="mx-auto max-w-5xl px-5">
-        <div className="mt-5 flex flex-wrap gap-2">
+        <div key={theme.hero_animation} className="hero-in hero-d3 mt-5 flex flex-wrap gap-2">
           <span className="pub-chip">
             <Clock className="h-3.5 w-3.5 pub-primary-text" />
             {todayLabel}

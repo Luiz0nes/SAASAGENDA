@@ -1,7 +1,7 @@
 // Motor de temas da página pública: fontes, cores, modo escuro e as
 // variáveis CSS que cada estabelecimento aplica na própria página.
 import type { CSSProperties } from 'react';
-import type { ButtonStyle, CardStyle, ColorMode, Theme, ThemeLayout, ThemeRadius } from '../types/database';
+import type { ButtonStyle, CardStyle, ColorMode, HeroAnimation, Theme, ThemeLayout, ThemeRadius } from '../types/database';
 
 // ---------------------------------------------------------------------
 // Fontes (Google Fonts). Só nomes desta lista são carregados.
@@ -139,6 +139,7 @@ export const DEFAULT_THEME: Theme = {
   button_style: 'solid',
   card_style: 'border',
   layout: 'classic',
+  hero_animation: 'soft',
   dark_mode_toggle: true,
   default_mode: 'light',
   headline: null,
@@ -158,6 +159,7 @@ const RADII: ThemeRadius[] = ['square', 'soft', 'rounded', 'pill'];
 const BUTTONS: ButtonStyle[] = ['solid', 'outline', 'soft'];
 const CARDS: CardStyle[] = ['border', 'shadow', 'flat'];
 const MODES: ColorMode[] = ['light', 'dark', 'system'];
+const HERO_ANIMATIONS: HeroAnimation[] = ['none', 'soft', 'dynamic'];
 
 function pick<T>(value: unknown, options: T[], fallback: T): T {
   return options.includes(value as T) ? (value as T) : fallback;
@@ -175,6 +177,7 @@ export function normalizeTheme(raw: Partial<Theme> | null | undefined): Theme {
   result.button_style = pick(t.button_style, BUTTONS, DEFAULT_THEME.button_style);
   result.card_style = pick(t.card_style, CARDS, DEFAULT_THEME.card_style);
   result.default_mode = pick(t.default_mode, MODES, DEFAULT_THEME.default_mode);
+  result.hero_animation = pick(t.hero_animation, HERO_ANIMATIONS, DEFAULT_THEME.hero_animation);
   result.gallery = Array.isArray(t.gallery) ? t.gallery.filter((u): u is string => typeof u === 'string').slice(0, 12) : [];
   result.dark_mode_toggle = t.dark_mode_toggle !== false;
   result.show_prices = t.show_prices !== false;
@@ -314,7 +317,8 @@ export function themeVars(theme: Theme, mode: ResolvedMode): CSSProperties {
     '--c-accent': p.accent,
     '--c-on-accent': readableOn(p.accent),
     '--c-ring': rgba(p.primary, 0.28),
-    '--header-bg': `linear-gradient(135deg, ${p.primary} 0%, ${mix(p.primary, '#000000', 0.4)} 100%)`,
+    // três paradas: o gradiente "respira" quando a animação do topo está ligada
+    '--header-bg': `linear-gradient(135deg, ${p.primary} 0%, ${mix(p.primary, '#000000', 0.42)} 50%, ${mix(p.primary, p.accent, 0.45)} 100%)`,
     '--r-card': radius.card,
     '--r-inner': radius.inner,
     '--r-btn': radius.btn,

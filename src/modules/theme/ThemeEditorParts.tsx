@@ -8,7 +8,7 @@ import { uploadAsset } from '../../lib/supabase';
 import {
   contrastRatio, FONT_CATEGORY_LABEL, fontFamily, FONTS, headingWeight, isHexColor, loadFonts, mix, readableOn, suggestDarkPalette,
 } from '../../lib/theme';
-import type { ButtonStyle, CardStyle, ColorMode, Theme, ThemeLayout, ThemeRadius } from '../../types/database';
+import type { ButtonStyle, CardStyle, ColorMode, HeroAnimation, Theme, ThemeLayout, ThemeRadius } from '../../types/database';
 import { FONT_PAIRS, PRESETS, QUICK_COLORS, SEGMENTS, type Segment, type ThemeDesign, type ThemePreset } from './presets';
 
 type Update = (patch: Partial<Theme>) => void;
@@ -325,6 +325,41 @@ const LAYOUT_OPTIONS: { value: ThemeLayout; label: string; description: string }
   { value: 'compact', label: 'Compacto', description: 'Sem capa, direto ao ponto' },
 ];
 
+const HERO_OPTIONS: { value: HeroAnimation; label: string; description: string }[] = [
+  { value: 'none', label: 'Sem animação', description: 'Topo parado' },
+  { value: 'soft', label: 'Suave', description: 'Entrada leve e capa com zoom lento' },
+  { value: 'dynamic', label: 'Dinâmica', description: 'Entrada marcante, brilho, capa em movimento e faixa animada' },
+];
+
+/** Mini demonstração animada de cada opção (usa os keyframes do index.css). */
+function HeroSketch({ value, theme }: { value: HeroAnimation; theme: Theme }) {
+  const animated = value !== 'none';
+  return (
+    <div
+      className="relative h-20 overflow-hidden rounded-lg"
+      style={{
+        backgroundImage: `linear-gradient(135deg, ${theme.primary_color}, ${mix(theme.primary_color, '#000000', 0.45)}, ${mix(theme.primary_color, theme.secondary_color, 0.5)})`,
+        backgroundSize: animated ? '220% 220%' : undefined,
+        animation: animated ? `hero-gradient ${value === 'dynamic' ? 4 : 7}s ease infinite` : undefined,
+      }}
+    >
+      <div className="absolute bottom-4 left-3 space-y-1.5">
+        <span className="block h-2.5 w-20 rounded-full bg-white/90" />
+        <span className="block h-1.5 w-12 rounded-full" style={{ backgroundColor: theme.secondary_color }} />
+      </div>
+      {value === 'dynamic' && (
+        <div
+          className="absolute inset-x-0 bottom-0 h-1.5"
+          style={{
+            backgroundImage: `repeating-linear-gradient(-45deg, ${theme.secondary_color} 0 7px, #ffffff 7px 14px, ${theme.primary_color} 14px 21px, #ffffff 21px 28px)`,
+            animation: 'hero-stripes 1.4s linear infinite',
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
 const RADIUS_OPTIONS: { value: ThemeRadius; label: string; px: string }[] = [
   { value: 'square', label: 'Retos', px: '3px' },
   { value: 'soft', label: 'Suaves', px: '10px' },
@@ -359,6 +394,20 @@ export function StyleTab({ theme, update }: { theme: Theme; update: Update }) {
             </OptionCard>
           ))}
         </div>
+      </div>
+
+      <div>
+        <SectionTitle title="Animação do topo" description="Como o nome, o logotipo e a capa aparecem quando o cliente abre a página." />
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          {HERO_OPTIONS.map((o) => (
+            <OptionCard key={o.value} selected={theme.hero_animation === o.value} onClick={() => update({ hero_animation: o.value })} title={o.label} description={o.description}>
+              <HeroSketch value={o.value} theme={theme} />
+            </OptionCard>
+          ))}
+        </div>
+        <p className="mt-2 text-xs text-slate-500">
+          Ao escolher, a animação toca de novo na pré-visualização. Quem ativou “reduzir movimento” no celular vê a página sem animação.
+        </p>
       </div>
 
       <div>

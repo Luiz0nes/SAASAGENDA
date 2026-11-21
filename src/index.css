@@ -168,3 +168,150 @@
     display: none;
   }
 }
+
+/* ---------------------------------------------------------------------
+   Animação do topo (hero) da página pública.
+   O nível vem de data-hero no elemento .pub: none | soft | dynamic.
+   --------------------------------------------------------------------- */
+@keyframes hero-fade-up {
+  from { opacity: 0; transform: translateY(var(--hero-shift, 14px)); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes hero-pop {
+  0% { opacity: 0; transform: scale(0.7) rotate(-6deg); }
+  70% { opacity: 1; transform: scale(1.06) rotate(1deg); }
+  100% { opacity: 1; transform: none; }
+}
+@keyframes hero-reveal {
+  from { opacity: 0; clip-path: inset(0 0 100% 0); transform: translateY(45%); }
+  to { opacity: 1; clip-path: inset(0 0 -10% 0); transform: none; }
+}
+@keyframes hero-zoom {
+  from { transform: scale(1.02); }
+  to { transform: scale(1.14); }
+}
+@keyframes hero-gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+@keyframes hero-line {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+@keyframes hero-shine {
+  from { transform: translateX(-150%) skewX(-20deg); }
+  to { transform: translateX(350%) skewX(-20deg); }
+}
+@keyframes hero-stripes {
+  to { background-position: 79.2px 0; }
+}
+
+@layer components {
+  /* entrada dos elementos */
+  .pub[data-hero='soft'] .hero-in {
+    animation: hero-fade-up 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+  .pub[data-hero='dynamic'] .hero-in {
+    --hero-shift: 30px;
+    animation: hero-fade-up 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .pub[data-hero='soft'] .hero-logo {
+    animation: hero-fade-up 0.6s ease-out both;
+  }
+  .pub[data-hero='dynamic'] .hero-logo {
+    animation: hero-pop 0.8s cubic-bezier(0.34, 1.4, 0.64, 1) both;
+  }
+  .pub[data-hero='dynamic'] .hero-title {
+    animation: hero-reveal 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
+  }
+  .pub[data-hero='soft'] .hero-title {
+    animation: hero-fade-up 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) 0.1s both;
+  }
+  .pub .hero-d1 { animation-delay: 0.1s; }
+  .pub .hero-d2 { animation-delay: 0.3s; }
+  .pub .hero-d3 { animation-delay: 0.45s; }
+  .pub .hero-d4 { animation-delay: 0.6s; }
+
+  /* capa: zoom lento e contínuo */
+  .pub[data-hero='soft'] .hero-cover {
+    animation: hero-zoom 22s ease-in-out infinite alternate;
+  }
+  .pub[data-hero='dynamic'] .hero-cover {
+    animation: hero-zoom 14s ease-in-out infinite alternate;
+  }
+  .hero-parallax {
+    will-change: transform;
+  }
+
+  /* fundo em degradê quando não há capa */
+  .pub[data-hero='soft'] .hero-gradient,
+  .pub[data-hero='dynamic'] .hero-gradient {
+    background-size: 220% 220%;
+    animation: hero-gradient 14s ease infinite;
+  }
+
+  /* linha de destaque que "cresce" */
+  .hero-line {
+    transform-origin: left center;
+  }
+  .hero-line-center {
+    transform-origin: center;
+  }
+  .pub[data-hero='soft'] .hero-line,
+  .pub[data-hero='dynamic'] .hero-line {
+    animation: hero-line 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.55s both;
+  }
+
+  /* brilho que atravessa o topo uma vez (dinâmica) */
+  .hero-shine {
+    display: none;
+  }
+  .pub[data-hero='dynamic'] .hero-shine {
+    display: block;
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .pub[data-hero='dynamic'] .hero-shine::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 35%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), transparent);
+    animation: hero-shine 1.6s ease-in-out 0.7s both;
+  }
+
+  /* faixa listrada em movimento, nas cores do tema (dinâmica) */
+  .hero-stripes {
+    display: none;
+  }
+  .pub[data-hero='dynamic'] .hero-stripes {
+    display: block;
+    height: 6px;
+    background-image: repeating-linear-gradient(
+      -45deg,
+      var(--c-accent) 0 14px,
+      #ffffff 14px 28px,
+      var(--c-primary) 28px 42px,
+      #ffffff 42px 56px
+    );
+    animation: hero-stripes 1.4s linear infinite;
+  }
+}
+
+/* quem pede menos movimento no celular não vê animação */
+@media (prefers-reduced-motion: reduce) {
+  .pub .hero-in,
+  .pub .hero-logo,
+  .pub .hero-title,
+  .pub .hero-cover,
+  .pub .hero-gradient,
+  .pub .hero-line,
+  .pub .hero-stripes,
+  .pub .hero-shine::after {
+    animation: none !important;
+  }
+}
