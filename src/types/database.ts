@@ -134,6 +134,8 @@ export interface Appointment {
   source: 'public' | 'admin';
   customer_notes: string | null;
   admin_notes: string | null;
+  /** preenchido por "Limpar concluídos": sai da agenda, continua no histórico */
+  archived_at: string | null;
   cancellation_reason: string | null;
 }
 

@@ -45,6 +45,7 @@ supabase/
     …09_service_promotions.sql   preço original (promoção) dos serviços
     …10_customer_plans.sql       vitrine de planos mensais para os clientes
     …11_realtime_appointments.sql agendamentos no Supabase Realtime
+    …12_archive_completed.sql    "Limpar concluídos" (arquiva, não apaga)
   functions/
     admin-create-establishment/  SuperAdmin cria estabelecimento + proprietário
     create-staff-user/           proprietário cria contas da equipe
@@ -88,6 +89,7 @@ O navegador nunca calcula disponibilidade nem grava horários diretamente pela p
 - **Topo animado:** entrada do logotipo, nome e frase; capa com zoom lento; no modo Dinâmico também brilho, parallax ao rolar e faixa listrada em movimento. Escolha em Personalização → Estilo (Sem animação, Suave ou Dinâmica); respeita o “reduzir movimento” do celular.
 - **Promoções e planos mensais:** serviço com preço “de” riscado e selo Promoção; vitrine de planos de assinatura (preços mensais, benefícios, texto “Como funciona”) com o botão “Quero assinar” pelo WhatsApp. Sem cobrança nem controle de sessões.
 - **Agenda em tempo real:** novo agendamento pela página aparece sozinho no painel (aviso, som curto, selo “Novo”, contadores dos dias), via Supabase Realtime respeitando a RLS; atualização de reserva a cada minuto e ao voltar para a aba.
+- **Limpar concluídos:** botão na Agenda que tira da lista os atendimentos concluídos (arquiva; continuam no faturamento e no histórico, e podem ser restaurados).
 - **Modo escuro:** botão para o cliente alternar na página pública (pode ser desligado), modo inicial claro/escuro/automático e paleta escura própria.
 - **QR Code:** QR do link de agendamento (gerador próprio, sem dependência), com cor e logotipo no centro, download em PNG e SVG e cartaz A4 pronto para imprimir.
 - **Público:** página do estabelecimento com o tema dele, fluxo de agendamento em etapas, galeria, equipe, consulta, cancelamento e reagendamento, links de WhatsApp.

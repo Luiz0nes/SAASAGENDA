@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import { MessageCircle, Plus, StickyNote } from 'lucide-react';
-import { Badge, Button, Card, ConfirmModal, EmptyState, ErrorBox, PageHeader, Spinner } from '../../components/ui';
+import { Archive, ArchiveRestore, Eraser, MessageCircle, Plus, StickyNote } from 'lucide-react';
+import { Badge, Button, Card, ConfirmModal, EmptyState, ErrorBox, PageHeader, Spinner, Toggle } from '../../components/ui';
 import { useToast } from '../../components/Toast';
 import { addDays, dateInZone, formatDateLong, formatMoney, formatPhone, formatTime, STATUS_LABEL, todayInZone, whatsappLink, zonedToIso } from '../../lib/format';
 import { errorMessage, supabase, unwrap } from '../../lib/supabase';
@@ -42,6 +42,9 @@ export function AppointmentsPage() {
   const [notesFor, setNotesFor] = useState<AppointmentWithRelations | null>(null);
   const [action, setAction] = useState<PendingAction | null>(null);
   const [working, setWorking] = useState(false);
+  const [showArchived, setShowArchived] = useState(false);
+  const [confirmClear, setConfirmClear] = useState(false);
+  const [clearing, setClearing] = useState(false);
 
   const catalog = useLoad<AgendaCatalog>(async () => {
     const [services, professionals, links] = await Promise.all([
@@ -66,8 +69,23 @@ export function AppointmentsPage() {
       .order('starts_at');
     if (professionalFilter) query = query.eq('professional_id', professionalFilter);
     if (statusFilter) query = query.eq('status', statusFilter);
+    if (!showArchived) query = query.is('archived_at', null);
     return unwrap<AppointmentWithRelations[]>(await query);
-  }, [establishment.id, date, professionalFilter, statusFilter, tz]);
+  }, [establishment.id, date, professionalFilter, statusFilter, showArchived, tz]);
+
+  // concluídos ainda na agenda (para o botão "Limpar concluídos")
+  const completedCount = useLoad(async () => {
+    let query = supabase
+      .from('appointments')
+      .select('id', { count: 'exact', head: true })
+      .eq('establishment_id', establishment.id)
+      .eq('status', 'completed')
+      .is('archived_at', null);
+    if (professionalFilter) query = query.eq('professional_id', professionalFilter);
+    const result = await query;
+    if (result.error) throw result.error;
+    return result.count ?? 0;
+  }, [establishment.id, professionalFilter]);
 
   // quantidade de agendamentos por dia, para as notificações nos botões
   const counts = useLoad<Record<string, DayCount>>(async () => {
@@ -76,6 +94,7 @@ export function AppointmentsPage() {
       .select('starts_at, status')
       .eq('establishment_id', establishment.id)
       .in('status', ['pending', 'confirmed', 'completed'])
+      .is('archived_at', null)
       .gte('starts_at', zonedToIso(stripStart, '00:00', tz))
       .lt('starts_at', zonedToIso(addDays(stripStart, STRIP_DAYS), '00:00', tz));
     if (professionalFilter) query = query.eq('professional_id', professionalFilter);
@@ -99,20 +118,59 @@ export function AppointmentsPage() {
   function refreshAll() {
     void list.reload(true);
     void counts.reload(true);
+    void completedCount.reload(true);
+  }
+
+  // ---- limpar (arquivar) concluídos ----
+  async function clearCompleted() {
+    setClearing(true);
+    try {
+      let query = supabase
+        .from('appointments')
+        .update({ archived_at: new Date().toISOString() })
+        .eq('establishment_id', establishment.id)
+        .eq('status', 'completed')
+        .is('archived_at', null);
+      if (professionalFilter) query = query.eq('professional_id', professionalFilter);
+      const archived = unwrap<{ id: string }[]>(await query.select('id'));
+      toast.success(
+        archived.length === 0
+          ? 'Não havia agendamentos concluídos para limpar.'
+          : `${archived.length} agendamento${archived.length > 1 ? 's concluídos foram limpos' : ' concluído foi limpo'} da agenda.`,
+      );
+      setConfirmClear(false);
+      refreshAll();
+    } catch (err) {
+      toast.error(errorMessage(err));
+    } finally {
+      setClearing(false);
+    }
+  }
+
+  async function restore(appointment: AppointmentWithRelations) {
+    try {
+      unwrap(await supabase.from('appointments').update({ archived_at: null }).eq('id', appointment.id));
+      toast.success('Agendamento restaurado na agenda.');
+      refreshAll();
+    } catch (err) {
+      toast.error(errorMessage(err));
+    }
   }
 
   // agendamentos que acabaram de chegar ficam destacados por alguns segundos
   const [fresh, setFresh] = useState<string[]>([]);
   const reloadList = list.reload;
   const reloadCounts = counts.reload;
+  const reloadCompleted = completedCount.reload;
   const onAgendaChanged = useCallback(
     (detail: AgendaChangedDetail) => {
       void reloadList(true);
       void reloadCounts(true);
+      void reloadCompleted(true);
       const id = detail.newAppointmentId;
       if (id) setFresh((current) => [...current, id]);
     },
-    [reloadList, reloadCounts],
+    [reloadList, reloadCounts, reloadCompleted],
   );
   useAgendaRefresh(onAgendaChanged);
   useEffect(() => {
@@ -159,11 +217,21 @@ export function AppointmentsPage() {
         title="Agenda"
         description="Agendamentos do dia, por profissional e status."
         actions={
-          can('manage_appointments') && catalog.data ? (
-            <Button icon={<Plus className="h-4 w-4" />} onClick={() => setCreating(true)}>
-              Novo agendamento
+          <>
+            <Button
+              variant="secondary"
+              icon={<Eraser className="h-4 w-4" />}
+              disabled={!completedCount.data}
+              onClick={() => setConfirmClear(true)}
+            >
+              Limpar concluídos{completedCount.data ? ` (${completedCount.data})` : ''}
             </Button>
-          ) : undefined
+            {can('manage_appointments') && catalog.data && (
+              <Button icon={<Plus className="h-4 w-4" />} onClick={() => setCreating(true)}>
+                Novo agendamento
+              </Button>
+            )}
+          </>
         }
       />
 
@@ -215,6 +283,9 @@ export function AppointmentsPage() {
             </select>
           </div>
         </div>
+        <div className="mt-3">
+          <Toggle checked={showArchived} onChange={setShowArchived} label="Mostrar também os concluídos já limpos" />
+        </div>
       </Card>
 
       {list.loading && <Spinner />}
@@ -255,6 +326,7 @@ export function AppointmentsPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     {fresh.includes(a.id) && <Badge tone="green">Novo</Badge>}
+                    {a.archived_at && <Badge>Limpo</Badge>}
                     {a.source === 'public' && <Badge>Online</Badge>}
                     <Badge tone={STATUS_TONE[a.status]}>{STATUS_LABEL[a.status]}</Badge>
                   </div>
@@ -284,6 +356,11 @@ export function AppointmentsPage() {
                         Cancelar
                       </Button>
                     </>
+                  )}
+                  {a.archived_at && (
+                    <Button size="sm" variant="secondary" icon={<ArchiveRestore className="h-4 w-4" />} onClick={() => void restore(a)}>
+                      Restaurar na agenda
+                    </Button>
                   )}
                   <Button size="sm" variant="ghost" icon={<StickyNote className="h-4 w-4" />} onClick={() => setNotesFor(a)}>
                     Observações
@@ -328,6 +405,27 @@ export function AppointmentsPage() {
           }}
         />
       )}
+      <ConfirmModal
+        open={confirmClear}
+        title="Limpar agendamentos concluídos"
+        message={
+          <div className="space-y-2">
+            <p>
+              {completedCount.data === 1 ? 'O agendamento concluído' : `Os ${completedCount.data ?? 0} agendamentos concluídos`}
+              {professionalFilter ? ' do profissional filtrado' : ''} vão sair da agenda.
+            </p>
+            <p className="flex items-start gap-2 text-slate-500">
+              <Archive className="mt-0.5 h-4 w-4 shrink-0" />
+              Nada é apagado: eles continuam no faturamento e no histórico, e você pode vê-los ou restaurá-los em “Mostrar também os concluídos já limpos”.
+              Pendentes, confirmados, cancelados e faltas não são mexidos.
+            </p>
+          </div>
+        }
+        confirmLabel="Limpar concluídos"
+        loading={clearing}
+        onConfirm={() => void clearCompleted()}
+        onClose={() => setConfirmClear(false)}
+      />
       <ConfirmModal
         open={action !== null}
         title={action?.title ?? ''}
