@@ -9,6 +9,7 @@ import { useLoad } from '../../lib/useLoad';
 import type { DashboardData } from '../../types/database';
 import { useAgendaRefresh } from './agendaRealtime';
 import { useEstablishment } from './EstablishmentContext';
+import { PushNotificationsCard } from './PushNotificationsCard';
 
 const PERIODS = [
   { label: 'Hoje', days: 0 },
@@ -68,6 +69,8 @@ export function DashboardPage() {
           </div>
         }
       />
+
+      <PushNotificationsCard compact />
 
       <Card className="mb-6 flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">

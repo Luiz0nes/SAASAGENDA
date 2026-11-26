@@ -9,3 +9,12 @@
 # arquivos gerados pelo Vite têm nome com hash: podem ficar em cache por 1 ano
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
+
+# service worker das notificações: sempre a versão mais nova
+/sw.js
+  Cache-Control: no-cache
+  Service-Worker-Allowed: /
+
+/manifest.webmanifest
+  Content-Type: application/manifest+json
+  Cache-Control: public, max-age=3600

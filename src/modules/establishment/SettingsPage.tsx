@@ -4,6 +4,7 @@ import { useToast } from '../../components/Toast';
 import { formatPhone, instagramHandle, isValidInstagram, onlyDigits } from '../../lib/format';
 import { errorMessage, supabase, unwrap } from '../../lib/supabase';
 import { useEstablishment } from './EstablishmentContext';
+import { PushNotificationsCard } from './PushNotificationsCard';
 
 export function SettingsPage() {
   const { establishment, refresh } = useEstablishment();
@@ -79,6 +80,7 @@ export function SettingsPage() {
   }
 
   return (
+    <>
     <form onSubmit={handleSubmit}>
       <PageHeader title="Configurações" description="Dados do estabelecimento, contato e regras de agendamento." />
 
@@ -167,5 +169,7 @@ export function SettingsPage() {
         </Button>
       </div>
     </form>
+    <PushNotificationsCard />
+    </>
   );
 }

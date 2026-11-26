@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { CalendarCheck, LogOut, Menu, Moon, Sun, X } from 'lucide-react';
 import { useAuth } from '../modules/auth/AuthContext';
+import { installPanelManifest, registerServiceWorker } from '../lib/push';
 
 export interface NavItem {
   to: string;
@@ -76,6 +77,13 @@ export function PanelLayout({ title, subtitle, items, banner, extra }: Props) {
       document.body.style.backgroundColor = '';
     };
   }, [dark]);
+
+  // app de celular do painel (Tela de Início + notificações)
+  useEffect(() => {
+    const remove = installPanelManifest();
+    registerServiceWorker()?.catch(() => undefined);
+    return remove;
+  }, []);
 
   const toggleDark = () => setDark((d) => !d);
   const navigate = useNavigate();

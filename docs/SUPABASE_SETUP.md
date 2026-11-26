@@ -85,3 +85,26 @@ Faça este roteiro uma vez para confirmar que tudo está ligado:
 | Link de recuperação abre e diz "inválido ou expirou" | URL não cadastrada em Redirect URLs, ou link já usado |
 | Serviço não aparece na página pública | Serviço inativo ou sem profissional ativo vinculado |
 | Nenhum horário disponível | Profissional sem horários definidos, estabelecimento fechado no dia, ou antecedência mínima/máxima |
+
+## Notificações no celular (Web Push)
+
+Quando um cliente agenda pela página pública, o gatilho `appointments_push_notify`
+chama a Edge Function `push-notify` (via `pg_net`), que envia a notificação para
+os aparelhos da equipe que ativaram em **Início** ou **Configurações**.
+
+Instalação nova:
+
+1. Gere as chaves VAPID: `npx web-push generate-vapid-keys`.
+2. No SQL Editor, guarde os segredos no Vault (nunca no repositório):
+   ```sql
+   select vault.create_secret('<chave pública>',  'vapid_public_key');
+   select vault.create_secret('<chave privada>',  'vapid_private_key');
+   select vault.create_secret('https://seu-dominio', 'vapid_subject');
+   select vault.create_secret(encode(gen_random_bytes(32), 'hex'), 'push_notify_secret');
+   select vault.create_secret('https://<ref>.supabase.co/functions/v1/push-notify', 'push_function_url');
+   ```
+3. Publique a função: `supabase functions deploy push-notify --no-verify-jwt`.
+4. Troque `VAPID_PUBLIC_KEY` em `src/lib/push.ts` pela sua chave pública.
+
+iPhone/iPad (iOS 16.4+): abrir o painel no Safari → Compartilhar → Adicionar à
+Tela de Início → abrir pelo ícone → entrar → **Ativar notificações**.

@@ -50,6 +50,7 @@ supabase/
     admin-create-establishment/  SuperAdmin cria estabelecimento + proprietário
     create-staff-user/           proprietário cria contas da equipe
     admin-manage-user/           redefinir senha / bloquear acesso
+    push-notify/                 notificações no celular de novos agendamentos (Web Push)
     _shared/                     CORS, autenticação do chamador, validações
 src/
   lib/           cliente Supabase, formatação, datas com fuso, useLoad,
@@ -81,6 +82,7 @@ O navegador nunca calcula disponibilidade nem grava horários diretamente pela p
 ## O que já está implementado
 
 - Banco completo (16 tabelas da especificação + `platform_settings`), RLS em todas as tabelas, auditoria por trigger, limites de plano aplicados no banco.
+- Notificações no celular (Web Push, inclusive iPhone pela Tela de Início) quando um cliente agenda.
 - Edge Functions de criação de proprietários e equipe (a Service Role Key fica só no servidor).
 - Autenticação: login, recuperação de senha, definição de senha por convite.
 - **SuperAdmin:** visão geral, estabelecimentos (criar, editar, suspender, atribuir plano), planos (CRUD).

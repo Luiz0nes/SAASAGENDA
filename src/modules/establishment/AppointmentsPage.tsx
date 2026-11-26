@@ -31,10 +31,18 @@ export function AppointmentsPage() {
   const { establishment, can } = useEstablishment();
   const toast = useToast();
   const tz = establishment.timezone;
-  const [date, setDate] = useState(() => todayInZone(tz));
-  // primeiro dia da faixa de 14 dias exibida em botões
-  const [stripStart, setStripStart] = useState(() => todayInZone(tz));
   const STRIP_DAYS = 14;
+  // ?data=AAAA-MM-DD (vem da notificação de novo agendamento)
+  const [initial] = useState(() => {
+    const today = todayInZone(tz);
+    const asked = new URLSearchParams(window.location.search).get('data');
+    if (!asked || !/^\d{4}-\d{2}-\d{2}$/.test(asked)) return { date: today, start: today };
+    const inStrip = asked >= today && asked < addDays(today, STRIP_DAYS);
+    return { date: asked, start: inStrip ? today : asked };
+  });
+  const [date, setDate] = useState(initial.date);
+  // primeiro dia da faixa de 14 dias exibida em botões
+  const [stripStart, setStripStart] = useState(initial.start);
   const [professionalFilter, setProfessionalFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [creating, setCreating] = useState(false);
